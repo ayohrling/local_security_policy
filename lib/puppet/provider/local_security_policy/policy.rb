@@ -530,7 +530,7 @@ Puppet::Type.type(:local_security_policy).provide(:policy) do
   def self.user_to_sid(value)
     sid = @sid_ary.select{ |home,user,sid| user.match(/^#{value}$/)}
     if sid.nil? or sid.empty?
-      sid_unk = "Error: SID Unk"
+      sid = value
     else
       sid = '*' + sid[0][2]
     end
@@ -541,7 +541,7 @@ Puppet::Type.type(:local_security_policy).provide(:policy) do
     value.gsub!(/(^\*)/ , '')
     user = @sid_ary.select { |home,user,sid| sid.match(/^#{value}$/)}
     if user.nil? or user.empty?
-      user = "Error: User Unk (" + value + ")"
+      user = value
     else
       user = user[0][1]
     end
