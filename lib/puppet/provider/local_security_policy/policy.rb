@@ -734,17 +734,26 @@ Puppet::Type.type(:local_security_policy).provide(:policy) do
       time = time.strftime("%Y%m%d%H%M%S")
       infout = "c:\\windows\\temp\\infimport-#{time}.inf"
       sdbout = "c:\\windows\\temp\\sdbimport-#{time}.inf"
-      policy_type = @property_hash[:policy_type]
-      policy_setting = @property_hash[:policy_setting]
+      if not @property_hash[:policy_setting].nil? {
+        policy_setting = @property_hash[:policy_setting]
+      } else {
+        policy_setting = lsp_mapping[resource[:name]]['name']
+      }
+      if not @property_hash[:policy_type].nil? {
+        policy_type = @property_hash[:policy_type]
+      } else {
+        policy_type = lsp_mapping[resource[:name]]['type']
+      }
       pv = ""
       if policy_type == 'Privilege Rights'
         sids = Array.new
         resource[:policy_value].split(",").sort.each do |suser|
           suser.strip!
-          sid = sid_ary.select { |home,user,sid| user.match(/^#{suser}$/)}
-          if ! sid.nil? and ! sid.empty?
-            sids << '*'+sid[0][2]
-          end
+          #sid = sid_ary.select { |home,user,sid| user.match(/^#{suser}$/)}
+          #if ! sid.nil? and ! sid.empty?
+          #  sids << '*'+sid[0][2]
+          #end
+          sids << user_to_sid(suser)
         end
         pv = sids.join(",")
       elsif policy_type == 'Event Audit'
