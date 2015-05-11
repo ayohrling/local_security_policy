@@ -737,12 +737,12 @@ Puppet::Type.type(:local_security_policy).provide(:policy) do
       if not @property_hash[:policy_setting].nil?
         policy_setting = @property_hash[:policy_setting]
       else
-        policy_setting = lsp_mapping[resource[:name]]['name']
+        policy_setting = self.class.lsp_mapping[resource[:name]]['name']
       end
       if not @property_hash[:policy_type].nil?
         policy_type = @property_hash[:policy_type]
       else
-        policy_type = lsp_mapping[resource[:name]]['type']
+        policy_type = self.class.lsp_mapping[resource[:name]]['type']
       end
       pv = ""
       if policy_type == 'Privilege Rights'
