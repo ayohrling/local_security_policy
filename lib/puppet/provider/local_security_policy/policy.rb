@@ -753,7 +753,7 @@ Puppet::Type.type(:local_security_policy).provide(:policy) do
           #if ! sid.nil? and ! sid.empty?
           #  sids << '*'+sid[0][2]
           #end
-          sids << user_to_sid(suser)
+          sids << self.class.user_to_sid(suser)
         end
         pv = sids.join(",")
       elsif policy_type == 'Event Audit'
