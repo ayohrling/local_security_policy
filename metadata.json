@@ -1,6 +1,6 @@
 {
   "name": "cannonps-local_security_policy",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "author": "Paul S Cannon",
   "summary": "Local Security Policy Editor",
   "license": "Apache 2.0",
@@ -9,4 +9,3 @@
   "issues_url": "https://github.com/cannonps/local_security_policy/issues",
   "dependencies": [ ]
 }
-
