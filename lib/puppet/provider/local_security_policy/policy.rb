@@ -773,8 +773,8 @@ Puppet::Type.type(:local_security_policy).provide(:policy) do
       file.close
       system('secedit','/configure','/db',sdbout, '/cfg',infout,'/quiet')
       #comment this out if you want to debug the import
-      File.delete(infout)
-      File.delete(sdbout)
+      #File.delete(infout)
+      #File.delete(sdbout)
       @property_hash = resource.to_hash
     end
   end
