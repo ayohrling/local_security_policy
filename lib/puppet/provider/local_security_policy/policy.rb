@@ -487,10 +487,10 @@ Puppet::Type.type(:local_security_policy).provide(:policy) do
           #Address special returns and show human readable strings
           if section_header == "Privilege Rights"
             users =  Array.new
-            policy_value.split(",").each do |sid|
+            policy_value.split(",").sort.each do |sid|
               users << sid_to_user(sid)
             end
-            policy_value = users.sort.join(",")
+            policy_value = users.join(",")
           elsif section_header == 'Event Audit'
             case policy_value.to_s
             when 3
@@ -739,14 +739,14 @@ Puppet::Type.type(:local_security_policy).provide(:policy) do
       pv = ""
       if policy_type == 'Privilege Rights'
         sids = Array.new
-        resource[:policy_value].split(",").sort.each do |suser|
+        resource[:policy_value].split(",").each do |suser|
           suser.strip!
           sid = sid_ary.select { |home,user,sid| user.match(/^#{suser}$/)}
           if ! sid.nil? and ! sid.empty?
             sids << '*'+sid[0][2]
           end
         end
-        pv = sids.join(",")
+        pv = sids.sort.join(",")
       elsif policy_type == 'Event Audit'
         if resource[:policy_value] == 'No auditing'
           pv = 0
