@@ -796,12 +796,6 @@ Puppet::Type.type(:local_security_policy).provide(:policy) do
     end
   end
 
-
-  def initalize(value={})
-    super(value)
-    @property_flush = {}
-  end
-
   def exists?
     @property_hash[:ensure] == :present
   end
