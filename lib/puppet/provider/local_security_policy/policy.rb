@@ -734,16 +734,16 @@ Puppet::Type.type(:local_security_policy).provide(:policy) do
       time = time.strftime("%Y%m%d%H%M%S")
       infout = "c:\\windows\\temp\\infimport-#{time}.inf"
       sdbout = "c:\\windows\\temp\\sdbimport-#{time}.inf"
-      if not @property_hash[:policy_setting].nil? {
+      if not @property_hash[:policy_setting].nil?
         policy_setting = @property_hash[:policy_setting]
-      } else {
+      else
         policy_setting = lsp_mapping[resource[:name]]['name']
-      }
-      if not @property_hash[:policy_type].nil? {
+      end
+      if not @property_hash[:policy_type].nil?
         policy_type = @property_hash[:policy_type]
-      } else {
+      else
         policy_type = lsp_mapping[resource[:name]]['type']
-      }
+      end
       pv = ""
       if policy_type == 'Privilege Rights'
         sids = Array.new
