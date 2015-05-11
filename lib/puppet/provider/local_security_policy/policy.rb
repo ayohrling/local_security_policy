@@ -490,7 +490,7 @@ Puppet::Type.type(:local_security_policy).provide(:policy) do
             policy_value.split(",").each do |sid|
               users << sid_to_user(sid)
             end
-            policy_value = users.join(",")
+            policy_value = users.sort.join(",")
           elsif section_header == 'Event Audit'
             case policy_value.to_s
             when 3
@@ -746,7 +746,7 @@ Puppet::Type.type(:local_security_policy).provide(:policy) do
             sids << '*'+sid[0][2]
           end
         end
-        pv = sids.join(",")
+        pv = sids.sort.join(",")
       elsif policy_type == 'Event Audit'
         if resource[:policy_value] == 'No auditing'
           pv = 0
