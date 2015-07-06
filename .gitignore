@@ -1,0 +1,11 @@
+.*.sw?
+pkg
+spec/fixtures/modules
+spec/fixtures/manifests
+.rspec_system
+.vagrant
+.bundle
+vendor
+.idea
+.project
+.DS_Store

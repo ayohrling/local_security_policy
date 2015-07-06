@@ -1,0 +1,14 @@
+[Unicode]
+Unicode=yes
+[System Access]
+MinimumPasswordAge = 1
+[Event Audit]
+AuditSystemEvents = 0
+[Version]
+signature="$CHICAGO$"
+Revision=1
+[Registry Values]
+MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Winlogon\CachedLogonsCount=1,"4"
+MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Setup\RecoveryConsole\SecurityLevel=4,0
+[Privilege Rights]
+SeNetworkLogonRight = *S-1-5-11,*S-1-5-32-544
