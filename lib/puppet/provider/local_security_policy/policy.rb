@@ -643,7 +643,7 @@ Puppet::Type.type(:local_security_policy).provide(:policy) do
   def flush
     if @property_flush
       time = Time.now
-      time = time.strftime("%Y%m%d%H%M%S")
+      time = time.strftime("%Y%m%d%H%M%S%L")
       infout = "c:\\windows\\temp\\infimport-#{time}.inf"
       sdbout = "c:\\windows\\temp\\sdbimport-#{time}.inf"
       if not @property_hash[:policy_setting].nil?
