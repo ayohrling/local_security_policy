@@ -493,11 +493,11 @@ Puppet::Type.type(:local_security_policy).provide(:policy) do
             policy_value = users.sort.join(",")
           elsif section_header == 'Event Audit'
             case policy_value.to_s
-            when 3
+            when '3'
               policy_value = "Success,Failure"
-            when 2
+            when '2'
               policy_value = "Failure"
-            when 1
+            when '1'
               policy_value = "Success"
             else
               policy_value = "No auditing"
@@ -643,7 +643,7 @@ Puppet::Type.type(:local_security_policy).provide(:policy) do
   def flush
     if @property_flush
       time = Time.now
-      time = time.strftime("%Y%m%d%H%M%S")
+      time = time.strftime("%Y%m%d%H%M%S%L")
       infout = "c:\\windows\\temp\\infimport-#{time}.inf"
       sdbout = "c:\\windows\\temp\\sdbimport-#{time}.inf"
       if not @property_hash[:policy_setting].nil?
@@ -673,10 +673,10 @@ Puppet::Type.type(:local_security_policy).provide(:policy) do
           pv = 0
         else
           pv = 0
-          resource[:policy_value].split(",").split do |ssetting|
-            if setting.strip! == 'Success'
+          resource[:policy_value].split(",").each do |ssetting|
+            if ssetting == 'Success'
               pv += 1
-            elsif setting.strip! == 'Failure'
+            elsif ssetting == 'Failure'
               pv += 2
             end
           end
