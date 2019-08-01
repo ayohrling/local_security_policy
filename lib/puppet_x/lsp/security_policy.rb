@@ -729,7 +729,7 @@ class SecurityPolicy
                 :reg_type => '4',
                 :policy_type => 'Registry Values',
             },
-            'Network security: All Local System to use computer identity for NTLM' => {
+            'Network security: Allow Local System to use computer identity for NTLM' => {
                 :name => 'MACHINE\System\CurrentControlSet\Control\Lsa\UseMachineId',
                 :reg_type => '4',
                 :policy_type => 'Registry Values',
