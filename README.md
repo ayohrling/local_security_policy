@@ -82,6 +82,7 @@ local_security_policy { 'System cryptography: Use FIPS compiant algorithms for e
       Accounts: Block Microsoft accounts
       Accounts: Limit local account use of blank passwords to console logon only
       Accounts: Rename administrator account
+      Accounts: Guest account status
       Accounts: Rename guest account
       Accounts: Require Login to Change Password
       Act as part of the operating system
@@ -178,6 +179,8 @@ local_security_policy { 'System cryptography: Use FIPS compiant algorithms for e
       Network access: Shares that can be accessed anonymously
       Network access: Sharing and security model for local accounts
       Network security: All Local System to use computer identity for NTLM
+      Network security: Allow LocalSystem NULL session fallback
+      Network Security: Allow PKU2U authentication requests to this computer to use online identities
       Network security: Do not store LAN Manager hash value on next password change
       Network security: Force logoff when logon hours expire
       Network security: LAN Manager authentication level
@@ -202,7 +205,7 @@ local_security_policy { 'System cryptography: Use FIPS compiant algorithms for e
       System cryptography: Force strong key protection for user keys stored on the computer
       System cryptography: Use FIPS compliant algorithms for encryption, hashing, and signing
       System objects: Require case insensitivity for non-Windows subsystems
-      System objects: Strengthen default permissions of internal system objects (e.g., Symbolic Links)
+      System objects: Strengthen default permissions of internal system objects (e.g. Symbolic Links)
       System settings: Optional subsystems
       System settings: Use Certificate Rules on Windows Executables for Software Restriction Policies
       Take ownership of files or other objects

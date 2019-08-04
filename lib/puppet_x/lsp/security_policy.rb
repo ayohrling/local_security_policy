@@ -319,6 +319,11 @@ class SecurityPolicy
                 :policy_type => 'System Access',
                 :data_type => :quoted_string
             },
+            'Accounts: Guest account status' => {
+                :name => 'EnableGuestAccount',
+                :policy_type => 'System Access',
+                :data_type => :quoted_string
+            },
             'Accounts: Require Login to Change Password' => {
                 :name => 'RequireLogonToChangePassword',
                 :policy_type => 'System Access'
@@ -734,6 +739,16 @@ class SecurityPolicy
                 :reg_type => '4',
                 :policy_type => 'Registry Values',
             },
+            'Network security: Allow LocalSystem NULL session fallback' => {
+                :name => 'MACHINE\System\CurrentControlSet\Control\Lsa\MSV1_0\allownullsessionfallback',
+                :reg_type => '4',
+                :policy_type => 'Registry Values',
+            },
+            'Network Security: Allow PKU2U authentication requests to this computer to use online identities' => {
+                :name => 'MACHINE\System\CurrentControlSet\Control\Lsa\pku2u\AllowOnlineID',
+                :reg_type => '4',
+                :policy_type => 'Registry Values',
+            },
             'Network access: Remotely accessible registry paths' => {
                 :name => 'MACHINE\System\CurrentControlSet\Control\SecurePipeServers\Winreg\AllowedExactPaths\Machine',
                 :reg_type => '7',
@@ -901,6 +916,11 @@ class SecurityPolicy
             },
             'System objects: Require case insensitivity for non-Windows subsystems' => {
                 :name => 'MACHINE\System\CurrentControlSet\Control\Session Manager\Kernel\ObCaseInsensitive',
+                :policy_type => "Registry Values",
+                :reg_type => "4"
+            },
+            'System objects: Strengthen default permissions of internal system objects (e.g. Symbolic Links)' => {
+                :name => 'MACHINE\System\CurrentControlSet\Control\Session Manager\ProtectionMode',
                 :policy_type => "Registry Values",
                 :reg_type => "4"
             },
