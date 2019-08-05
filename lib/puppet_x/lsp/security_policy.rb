@@ -242,7 +242,9 @@ class SecurityPolicy
 
     def self.convert_registry_value(name, value)
         value = value.to_s
-        return value if value.split(',').count > 1
+        # This really should check whether the first chars are an integer followed by a comma
+        #return value if value.split(',').count > 1
+        return value if value.to_s =~ /^\d+,/
         policy_hash = find_mapping_from_policy_desc(name)
         "#{policy_hash[:reg_type]},#{value}"
     end
@@ -322,7 +324,6 @@ class SecurityPolicy
             'Accounts: Guest account status' => {
                 :name => 'EnableGuestAccount',
                 :policy_type => 'System Access',
-                :data_type => :quoted_string
             },
             'Accounts: Require Login to Change Password' => {
                 :name => 'RequireLogonToChangePassword',
