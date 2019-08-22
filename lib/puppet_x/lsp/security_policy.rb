@@ -242,8 +242,14 @@ class SecurityPolicy
 
     def self.convert_registry_value(name, value)
         value = value.to_s
-        return value if value.split(',').count > 1
+        # This really should check whether the first chars are an integer followed by a comma
+        #return value if value.split(',').count > 1
+        return value if value.to_s =~ /^\d+,/
         policy_hash = find_mapping_from_policy_desc(name)
+        # Force a quoted string for REG_SZ if not already quoted
+        if policy_hash[:reg_type] == "1" and value !~ /^\".*\"$/
+            value = "\"#{value}\""
+        end
         "#{policy_hash[:reg_type]},#{value}"
     end
 
@@ -319,6 +325,10 @@ class SecurityPolicy
                 :policy_type => 'System Access',
                 :data_type => :quoted_string
             },
+            'Accounts: Guest account status' => {
+                :name => 'EnableGuestAccount',
+                :policy_type => 'System Access',
+            },
             'Accounts: Require Login to Change Password' => {
                 :name => 'RequireLogonToChangePassword',
                 :policy_type => 'System Access'
@@ -329,14 +339,6 @@ class SecurityPolicy
             },
             'Network access: Allow anonymous SID/name translation' => {
                 :name => 'LSAAnonymousNameLookup',
-                :policy_type => 'System Access'
-            },
-            'EnableAdminAccount' => {
-                :name => 'EnableAdminAccount',
-                :policy_type => 'System Access'
-            },
-            "EnableGuestAccount"=>{
-                :name=>"EnableGuestAccount",
                 :policy_type => 'System Access'
             },
             # Audit Policy Mappings
@@ -729,8 +731,18 @@ class SecurityPolicy
                 :reg_type => '4',
                 :policy_type => 'Registry Values',
             },
-            'Network security: All Local System to use computer identity for NTLM' => {
+            'Network security: Allow Local System to use computer identity for NTLM' => {
                 :name => 'MACHINE\System\CurrentControlSet\Control\Lsa\UseMachineId',
+                :reg_type => '4',
+                :policy_type => 'Registry Values',
+            },
+            'Network security: Allow LocalSystem NULL session fallback' => {
+                :name => 'MACHINE\System\CurrentControlSet\Control\Lsa\MSV1_0\allownullsessionfallback',
+                :reg_type => '4',
+                :policy_type => 'Registry Values',
+            },
+            'Network Security: Allow PKU2U authentication requests to this computer to use online identities' => {
+                :name => 'MACHINE\System\CurrentControlSet\Control\Lsa\pku2u\AllowOnlineID',
                 :reg_type => '4',
                 :policy_type => 'Registry Values',
             },
@@ -901,6 +913,11 @@ class SecurityPolicy
             },
             'System objects: Require case insensitivity for non-Windows subsystems' => {
                 :name => 'MACHINE\System\CurrentControlSet\Control\Session Manager\Kernel\ObCaseInsensitive',
+                :policy_type => "Registry Values",
+                :reg_type => "4"
+            },
+            'System objects: Strengthen default permissions of internal system objects (e.g. Symbolic Links)' => {
+                :name => 'MACHINE\System\CurrentControlSet\Control\Session Manager\ProtectionMode',
                 :policy_type => "Registry Values",
                 :reg_type => "4"
             },
