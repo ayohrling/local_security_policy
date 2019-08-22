@@ -187,6 +187,7 @@ local_security_policy { 'System cryptography: Use FIPS compiant algorithms for e
       Password must meet complexity requirements
       Perform volume maintenance tasks
       Prevent enabling lock screen camera
+      Prevent enabling lock screen slide show
       Profile single process
       Profile system performance
       Recovery console: Allow automatic administrative logon
