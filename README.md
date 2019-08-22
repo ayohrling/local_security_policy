@@ -186,6 +186,7 @@ local_security_policy { 'System cryptography: Use FIPS compiant algorithms for e
       Network security: Minimum session security for NTLM SSP based (including secure RPC) servers
       Password must meet complexity requirements
       Perform volume maintenance tasks
+      Prevent enabling lock screen camera
       Profile single process
       Profile system performance
       Recovery console: Allow automatic administrative logon

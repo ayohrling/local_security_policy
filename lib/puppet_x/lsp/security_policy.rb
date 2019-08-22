@@ -753,6 +753,11 @@ class SecurityPolicy
                 :policy_type => 'Registry Values',
                 :reg_type => '4',
             },
+            'Prevent enabling lock screen camera' => {
+                :name => 'MACHINE\Software\Policies\Microsoft\Windows\Personalization\NoLockScreenCamera',
+                :policy_type => 'Registry Values',
+                :reg_type => '4',
+            },
             'Recovery console: Allow automatic administrative logon' => {
                 :name => 'MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Setup\RecoveryConsole\SecurityLevel',
                 :policy_type => 'Registry Values',
