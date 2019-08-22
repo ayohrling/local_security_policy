@@ -57,6 +57,10 @@ Puppet::Type.type(:local_security_policy).provide(:policy) do
   # converts everything to a string
   # returns the value
   def self.fixup_value(value, type)
+    # It would be nice to be able to specify a list as an array, but it might need more than this
+    # if value.kind_of?(Array)
+    #   value = value.join(',')
+    # end
     value = value.to_s.strip
     case type
       when :quoted_string

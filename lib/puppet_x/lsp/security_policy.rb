@@ -337,14 +337,6 @@ class SecurityPolicy
                 :name => 'LSAAnonymousNameLookup',
                 :policy_type => 'System Access'
             },
-            'EnableAdminAccount' => {
-                :name => 'EnableAdminAccount',
-                :policy_type => 'System Access'
-            },
-            "EnableGuestAccount"=>{
-                :name=>"EnableGuestAccount",
-                :policy_type => 'System Access'
-            },
             # Audit Policy Mappings
             'Audit account logon events' => {
                 :name => 'AuditAccountLogon',
