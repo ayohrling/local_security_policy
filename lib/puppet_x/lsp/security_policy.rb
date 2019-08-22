@@ -246,6 +246,10 @@ class SecurityPolicy
         #return value if value.split(',').count > 1
         return value if value.to_s =~ /^\d+,/
         policy_hash = find_mapping_from_policy_desc(name)
+        # Force a quoted string for REG_SZ if not already quoted
+        if policy_hash[:reg_type] == "1" and value !~ /^\".*\"$/
+            value = "\"#{value}\""
+        end
         "#{policy_hash[:reg_type]},#{value}"
     end
 
