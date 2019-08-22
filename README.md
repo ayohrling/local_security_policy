@@ -91,17 +91,17 @@ local_security_policy { 'System cryptography: Use FIPS compiant algorithms for e
       Allow log on through Remote Desktop Services
       Audit account logon events
       Audit account management
-      Audit: Audit the access of global system objects
-      Audit: Audit the use of Backup and Restore privilege
       Audit directory service access
-      Audit: Force audit policy subcategory settings (Windows Vista or later) to override audit policy category settings
       Audit logon events
       Audit object access
       Audit policy change
       Audit privilege use
       Audit process tracking
-      Audit: Shut down system immediately if unable to log security audits
       Audit system events
+      Audit: Audit the access of global system objects
+      Audit: Audit the use of Backup and Restore privilege
+      Audit: Force audit policy subcategory settings (Windows Vista or later) to override audit policy category settings
+      Audit: Shut down system immediately if unable to log security audits
       Back up files and directories
       Bypass traverse checking
       Change the system time
@@ -117,8 +117,8 @@ local_security_policy { 'System cryptography: Use FIPS compiant algorithms for e
       Deny log on as a service
       Deny log on locally
       Deny log on through Remote Desktop Services
-      Devices: Allowed to format and eject removable media
       Devices: Allow undock without having to log on
+      Devices: Allowed to format and eject removable media
       Devices: Prevent users from installing printer drivers
       Devices: Restrict CD-ROM access to locally logged-on user only
       Devices: Restrict floppy access to locally logged-on user only
@@ -128,8 +128,8 @@ local_security_policy { 'System cryptography: Use FIPS compiant algorithms for e
       Domain member: Disable machine account password changes
       Domain member: Maximum machine account password age
       Domain member: Require strong (Windows 2000 or later) session key
-      EnableAdminAccount
       Enable computer and user accounts to be trusted for delegation
+      EnableAdminAccount
       Enforce password history
       Force shutdown from a remote system
       Generate security audits
@@ -194,9 +194,9 @@ local_security_policy { 'System cryptography: Use FIPS compiant algorithms for e
       Replace a process level token
       Reset account lockout counter after
       Restore files and directories
+      Shut down the system
       Shutdown: Allow system to be shut down without having to log on
       Shutdown: Clear virtual memory pagefile
-      Shut down the system
       Store passwords using reversible encryption
       Synchronize directory service data
       System cryptography: Force strong key protection for user keys stored on the computer
@@ -211,8 +211,8 @@ local_security_policy { 'System cryptography: Use FIPS compiant algorithms for e
       User Account Control: Behavior of the elevation prompt for administrators in Admin Approval Mode
       User Account Control: Behavior of the elevation prompt for standard users
       User Account Control: Detect application installations and prompt for elevation
-      User Account Control: Only elevate executables that are signed and validated
       User Account Control: Only elevate UIAccess applications that are installed in secure locations
+      User Account Control: Only elevate executables that are signed and validated
       User Account Control: Run all administrators in Admin Approval Mode
       User Account Control: Switch to the secure desktop when prompting for elevation
       User Account Control: Virtualize file and registry write failures to per-user locations

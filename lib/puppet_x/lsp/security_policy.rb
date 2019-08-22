@@ -87,8 +87,10 @@ class SecurityPolicy
                 value = event_to_audit_id(policy_hash[:policy_value])
             when 'Registry Values'
                 value = SecurityPolicy.convert_registry_value(policy_hash[:name], policy_hash[:policy_value])
-            else
+            when 'System Access'
                 value = policy_hash[:policy_value]
+            else
+                raise Puppet::Error, "Invalid policy_type: #{policy_hash[:policy_type]}"
         end
         policy_hash[:policy_value] = value
         policy_hash
@@ -261,85 +263,17 @@ class SecurityPolicy
             when 'Registry Values'
                 # convert the value to a datatype/value
                 convert_registry_value(policy_hash[:name], value)
-            else
+            when 'System Access'
                 value
+            else
+                raise Puppet::Error, "Invalid policy_type: #{policy_type}"
+                
         end
     end
 
     def self.lsp_mapping
-        @lsp_mapping ||= {
-            # Password policy Mappings
-            'Enforce password history' => {
-                :name => 'PasswordHistorySize',
-                :policy_type => 'System Access',
-            },
-            'Maximum password age' => {
-                :name => 'MaximumPasswordAge',
-                :policy_type => 'System Access',
-            },
-            'Minimum password age' => {
-                :name => 'MinimumPasswordAge',
-                :policy_type => 'System Access',
-            },
-            'Minimum password length' => {
-                :name => 'MinimumPasswordLength',
-                :policy_type => 'System Access',
-            },
-            'Password must meet complexity requirements' => {
-                :name => 'PasswordComplexity',
-                :policy_type => 'System Access',
-            },
-            'Store passwords using reversible encryption' => {
-                :name => 'ClearTextPassword',
-                :policy_type => 'System Access',
-            },
-            'Account lockout threshold' => {
-                :name => 'LockoutBadCount',
-                :policy_type => 'System Access',
-            },
-            'Account lockout duration' => {
-                :name => 'LockoutDuration',
-                :policy_type => 'System Access',
-            },
-            'Reset account lockout counter after' => {
-                :name => 'ResetLockoutCount',
-                :policy_type => 'System Access',
-            },
-            'Accounts: Rename administrator account' => {
-                :name => 'NewAdministratorName',
-                :policy_type => 'System Access',
-                :data_type => :quoted_string
-            },
-            'Accounts: Administrator account status' => {
-                :name => 'EnableAdminAccount',
-                :policy_type => 'System Access',
-            },
-            'Accounts: Rename guest account' => {
-                :name => 'NewGuestName',
-                :policy_type => 'System Access',
-                :data_type => :quoted_string
-            },
-            'Accounts: Require Login to Change Password' => {
-                :name => 'RequireLogonToChangePassword',
-                :policy_type => 'System Access'
-            },
-            'Network security: Force logoff when logon hours expire' => {
-                :name => 'ForceLogoffWhenHourExpire',
-                :policy_type => 'System Access'
-            },
-            'Network access: Allow anonymous SID/name translation' => {
-                :name => 'LSAAnonymousNameLookup',
-                :policy_type => 'System Access'
-            },
-            'EnableAdminAccount' => {
-                :name => 'EnableAdminAccount',
-                :policy_type => 'System Access'
-            },
-            "EnableGuestAccount"=>{
-                :name=>"EnableGuestAccount",
-                :policy_type => 'System Access'
-            },
-            # Audit Policy Mappings
+        @lsp_mapping ||= {  # Sort by policy_type, then description.
+            # Event Audit
             'Audit account logon events' => {
                 :name => 'AuditAccountLogon',
                 :policy_type => 'Event Audit',
@@ -376,12 +310,7 @@ class SecurityPolicy
                 :name => 'AuditSystemEvents',
                 :policy_type => 'Event Audit',
             },
-            'Audit: Force audit policy subcategory settings (Windows Vista or later) to override audit policy category settings' => {
-                :name => 'MACHINE\System\CurrentControlSet\Control\Lsa\SCENoApplyLegacyAuditPolicy',
-                :reg_type => '4',
-                :policy_type => 'Registry Values',
-            },
-            #User rights mapping
+            # Privilege Rights
             'Access Credential Manager as a trusted caller' => {
                 :name => 'SeTrustedCredManAccessPrivilege',
                 :policy_type => 'Privilege Rights',
@@ -558,271 +487,166 @@ class SecurityPolicy
                 :name => 'SeTakeOwnershipPrivilege',
                 :policy_type => 'Privilege Rights',
             },
-            #Registry Keys
-            'Recovery console: Allow automatic administrative logon' => {
-                :name => 'MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Setup\RecoveryConsole\SecurityLevel',
-                :reg_type => '4',
-                :policy_type => 'Registry Values',
-            },
-            'Recovery console: Allow floppy copy and access to all drives and all folders' => {
-                :name => 'MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Setup\RecoveryConsole\SetCommand',
-                :reg_type => '4',
-                :policy_type => 'Registry Values',
-            },
-            'Interactive logon: Number of previous logons to cache (in case domain controller is not available)' => {
-                :name => 'MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Winlogon\CachedLogonsCount',
-                :reg_type => '1',
-                :policy_type => 'Registry Values',
-            },
-            'Interactive logon: Require Domain Controller authentication to unlock workstation' => {
-                :name => 'MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Winlogon\ForceUnlockLogon',
-                :reg_type => '4',
-                :policy_type => 'Registry Values',
-            },
-            'Interactive logon: Prompt user to change password before expiration' => {
-                :name => 'MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Winlogon\PasswordExpiryWarning',
-                :reg_type => '4',
-                :policy_type => 'Registry Values',
-            },
-            'Interactive logon: Smart card removal behavior' => {
-                :name => 'MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Winlogon\ScRemoveOption',
-                :reg_type => '1',
-                :policy_type => 'Registry Values',
-            },
-            'User Account Control: Behavior of the elevation prompt for administrators in Admin Approval Mode' => {
-                :name => 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\ConsentPromptBehaviorAdmin',
-                :reg_type => '4',
-                :policy_type => 'Registry Values',
-            },
-            'User Account Control: Behavior of the elevation prompt for standard users' => {
-                :name => 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\ConsentPromptBehaviorUser',
-                :reg_type => '4',
-                :policy_type => 'Registry Values',
-            },
-            'Interactive logon: Do not require CTRL+ALT+DEL' => {
-                :name => 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\DisableCAD',
-                :reg_type => '4',
-                :policy_type => 'Registry Values',
-            },
-            'Interactive logon: Do not display last user name' => {
-                :name => 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\DontDisplayLastUserName',
-                :reg_type => '4',
-                :policy_type => 'Registry Values',
-            },
-            'User Account Control: Detect application installations and prompt for elevation' => {
-                :name => 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\EnableInstallerDetection',
-                :reg_type => '4',
-                :policy_type => 'Registry Values',
-            },
-            'User Account Control: Run all administrators in Admin Approval Mode' => {
-                :name => 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\EnableLUA',
-                :reg_type => '4',
-                :policy_type => 'Registry Values',
-            },
-            'User Account Control: Only elevate UIAccess applications that are installed in secure locations' => {
-                :name => 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\EnableSecureUIAPaths',
-                :reg_type => '4',
-                :policy_type => 'Registry Values',
-            },
-            'User Account Control: Allow UIAccess applications to prompt for elevation without using the secure desktop' => {
-                :name => 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\EnableUIADesktopToggle',
-                :reg_type => '4',
-                :policy_type => 'Registry Values',
-            },
-            'User Account Control: Virtualize file and registry write failures to per-user locations' => {
-                :name => 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\EnableVirtualization',
-                :reg_type => '4',
-                :policy_type => 'Registry Values',
-            },
-            'User Account Control: Admin Approval Mode for the Built-in Administrator account' => {
-                :name => 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\FilterAdministratorToken',
-                :reg_type => '4',
-                :policy_type => 'Registry Values',
-            },
-            'Interactive logon: Message title for users attempting to log on' => {
-                :name => 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\LegalNoticeCaption',
-                :reg_type => '1',
-                :policy_type => 'Registry Values',
-            },
-            'Interactive logon: Message text for users attempting to log on' => {
-                :name => 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\LegalNoticeText',
-                :reg_type => '7',
-                :policy_type => 'Registry Values',
-            },
-            'User Account Control: Switch to the secure desktop when prompting for elevation' => {
-                :name => 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\PromptOnSecureDesktop',
-                :reg_type => '4',
-                :policy_type => 'Registry Values',
-            },
-            'Interactive logon: Require smart card' => {
-                :name => 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\ScForceOption',
-                :reg_type => '4',
-                :policy_type => 'Registry Values',
-            },
-            'Shutdown: Allow system to be shut down without having to log on' => {
-                :name => 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\ShutdownWithoutLogon',
-                :reg_type => '4',
-                :policy_type => 'Registry Values',
-            },
-            'Devices: Allow undock without having to log on' => {
-                :name => 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\UndockWithoutLogon',
-                :reg_type => '4',
-                :policy_type => 'Registry Values',
-            },
-            'User Account Control: Only elevate executables that are signed and validated' => {
-                :name => 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\ValidateAdminCodeSignatures',
-                :reg_type => '4',
-                :policy_type => 'Registry Values',
-            },
-            'System settings: Use Certificate Rules on Windows Executables for Software Restriction Policies' => {
-                :name => 'MACHINE\Software\Policies\Microsoft\Windows\Safer\CodeIdentifiers\AuthenticodeEnabled',
-                :reg_type => '4',
-                :policy_type => 'Registry Values',
-            },
-            'Audit: Audit the access of global system objects' => {
-                :name => 'MACHINE\System\CurrentControlSet\Control\Lsa\AuditBaseObjects',
-                :reg_type => '4',
-                :policy_type => 'Registry Values',
-            },
-            'Audit: Shut down system immediately if unable to log security audits' => {
-                :name => 'MACHINE\System\CurrentControlSet\Control\Lsa\CrashOnAuditFail',
-                :reg_type => '4',
-                :policy_type => 'Registry Values',
-            },
-            'Network access: Do not allow storage of passwords and credentials for network authentication' => {
-                :name => 'MACHINE\System\CurrentControlSet\Control\Lsa\DisableDomainCreds',
-                :reg_type => '4',
-                :policy_type => 'Registry Values',
-            },
-            'Network access: Let Everyone permissions apply to anonymous users' => {
-                :name => 'MACHINE\System\CurrentControlSet\Control\Lsa\EveryoneIncludesAnonymous',
-                :reg_type => '4',
-                :policy_type => 'Registry Values',
-            },
-            'Network access: Sharing and security model for local accounts' => {
-                :name => 'MACHINE\System\CurrentControlSet\Control\Lsa\ForceGuest',
-                :reg_type => '4',
-                :policy_type => 'Registry Values',
-            },
-            'System cryptography: Use FIPS compliant algorithms for encryption, hashing, and signing' => {
-                :name => 'MACHINE\System\CurrentControlSet\Control\Lsa\FIPSAlgorithmPolicy\Enabled',
-                :reg_type => '4',
-                :policy_type => 'Registry Values',
-            },
-            'System cryptography: Force strong key protection for user keys stored on the computer' => {
-                :name => 'MACHINE\Software\Policies\Microsoft\Cryptography\ForceKeyProtection',
-                :reg_type => '4',
-                :policy_type => 'Registry Values',
-            },
-            'Audit: Audit the use of Backup and Restore privilege' => {
-                :name => 'MACHINE\System\CurrentControlSet\Control\Lsa\FullPrivilegeAuditing',
-                :reg_type => '3',
-                :policy_type => 'Registry Values',
-            },
+            # Registry Values
             'Accounts: Block Microsoft accounts' => {
                 :name => 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\NoConnectedUser',
-                :reg_type => '4',
                 :policy_type => 'Registry Values',
+                :reg_type => '4',
             },
             'Accounts: Limit local account use of blank passwords to console logon only' => {
                 :name => 'MACHINE\System\CurrentControlSet\Control\Lsa\LimitBlankPasswordUse',
+                :policy_type => 'Registry Values',
                 :reg_type => '4',
-                :policy_type => 'Registry Values',
             },
-            'Network security: All Local System to use computer identity for NTLM' => {
-                :name => 'MACHINE\System\CurrentControlSet\Control\Lsa\UseMachineId',
+            'Audit: Audit the access of global system objects' => {
+                :name => 'MACHINE\System\CurrentControlSet\Control\Lsa\AuditBaseObjects',
+                :policy_type => 'Registry Values',
                 :reg_type => '4',
-                :policy_type => 'Registry Values',
             },
-            'Network access: Remotely accessible registry paths' => {
-                :name => 'MACHINE\System\CurrentControlSet\Control\SecurePipeServers\Winreg\AllowedExactPaths\Machine',
-                :reg_type => '7',
+            'Audit: Audit the use of Backup and Restore privilege' => {
+                :name => 'MACHINE\System\CurrentControlSet\Control\Lsa\FullPrivilegeAuditing',
                 :policy_type => 'Registry Values',
+                :reg_type => '3',
             },
-            'Devices: Restrict CD-ROM access to locally logged-on user only' => {
-                :name => 'MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Winlogon\AllocateCDRoms',
-                :reg_type => '1',
+            'Audit: Force audit policy subcategory settings (Windows Vista or later) to override audit policy category settings' => {
+                :name => 'MACHINE\System\CurrentControlSet\Control\Lsa\SCENoApplyLegacyAuditPolicy',
                 :policy_type => 'Registry Values',
+                :reg_type => '4',
             },
-            'Devices: Restrict floppy access to locally logged-on user only' => {
-                :name => 'MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Winlogon\AllocateFloppies',
-                :reg_type => '1',
+            'Audit: Shut down system immediately if unable to log security audits' => {
+                :name => 'MACHINE\System\CurrentControlSet\Control\Lsa\CrashOnAuditFail',
                 :policy_type => 'Registry Values',
+                :reg_type => '4',
+            },
+            'Devices: Allow undock without having to log on' => {
+                :name => 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\UndockWithoutLogon',
+                :policy_type => 'Registry Values',
+                :reg_type => '4',
             },
             'Devices: Allowed to format and eject removable media' => {
                 :name => 'MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Winlogon\AllocateDASD',
-                :reg_type => '1',
                 :policy_type => 'Registry Values',
+                :reg_type => '1',
             },
             'Devices: Prevent users from installing printer drivers' => {
                 :name => 'MACHINE\System\CurrentControlSet\Control\Print\Providers\LanMan Print Services\Servers\AddPrinterDrivers',
-                :reg_type => '4',
                 :policy_type => 'Registry Values',
+                :reg_type => '4',
+            },
+            'Devices: Restrict CD-ROM access to locally logged-on user only' => {
+                :name => 'MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Winlogon\AllocateCDRoms',
+                :policy_type => 'Registry Values',
+                :reg_type => '1',
+            },
+            'Devices: Restrict floppy access to locally logged-on user only' => {
+                :name => 'MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Winlogon\AllocateFloppies',
+                :policy_type => 'Registry Values',
+                :reg_type => '1',
             },
             'Domain member: Digitally encrypt or sign secure channel data (always)' => {
                 :name => 'MACHINE\System\CurrentControlSet\Services\Netlogon\Parameters\RequireSignOrSeal',
-                :reg_type => '4',
                 :policy_type => 'Registry Values',
+                :reg_type => '4',
             },
             'Domain member: Digitally encrypt secure channel data (when possible)' => {
                 :name => 'MACHINE\System\CurrentControlSet\Services\Netlogon\Parameters\SealSecureChannel',
-                :reg_type => '4',
                 :policy_type => 'Registry Values',
+                :reg_type => '4',
             },
             'Domain member: Digitally sign secure channel data (when possible)' => {
                 :name => 'MACHINE\System\CurrentControlSet\Services\Netlogon\Parameters\SignSecureChannel',
-                :reg_type => '4',
                 :policy_type => 'Registry Values',
+                :reg_type => '4',
             },
             'Domain member: Disable machine account password changes' => {
                 :name => 'MACHINE\System\CurrentControlSet\Services\Netlogon\Parameters\DisablePasswordChange',
-                :reg_type => '4',
                 :policy_type => 'Registry Values',
+                :reg_type => '4',
             },
             'Domain member: Maximum machine account password age' => {
                 :name => 'MACHINE\System\CurrentControlSet\Services\Netlogon\Parameters\MaximumPasswordAge',
-                :reg_type => '4',
                 :policy_type => 'Registry Values',
+                :reg_type => '4',
             },
             'Domain member: Require strong (Windows 2000 or later) session key' => {
                 :name => 'MACHINE\System\CurrentControlSet\Services\Netlogon\Parameters\RequireStrongKey',
-                :reg_type => '4',
                 :policy_type => 'Registry Values',
+                :reg_type => '4',
             },
             'Interactive logon: Display user information when the session is locked' => {
                 :name => 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\DontDisplayLockedUserId',
-                :reg_type => '4',
                 :policy_type => 'Registry Values',
+                :reg_type => '4',
             },
-            'Interactive logon: Machine inactivity limit' => {
-                :name => 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\InactivityTimeoutSecs',
-                :reg_type => '4',
+            'Interactive logon: Do not display last user name' => {
+                :name => 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\DontDisplayLastUserName',
                 :policy_type => 'Registry Values',
+                :reg_type => '4',
+            },
+            'Interactive logon: Do not require CTRL+ALT+DEL' => {
+                :name => 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\DisableCAD',
+                :policy_type => 'Registry Values',
+                :reg_type => '4',
             },
             'Interactive logon: Machine account lockout threshold' => {
                 :name => 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\MaxDevicePasswordFailedAttempts',
-                :reg_type => '4',
                 :policy_type => 'Registry Values',
+                :reg_type => '4',
+            },
+            'Interactive logon: Machine inactivity limit' => {
+                :name => 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\InactivityTimeoutSecs',
+                :policy_type => 'Registry Values',
+                :reg_type => '4',
+            },
+            'Interactive logon: Message text for users attempting to log on' => {
+                :name => 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\LegalNoticeText',
+                :policy_type => 'Registry Values',
+                :reg_type => '7',
+            },
+            'Interactive logon: Message title for users attempting to log on' => {
+                :name => 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\LegalNoticeCaption',
+                :policy_type => 'Registry Values',
+                :reg_type => '1',
+            },
+            'Interactive logon: Number of previous logons to cache (in case domain controller is not available)' => {
+                :name => 'MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Winlogon\CachedLogonsCount',
+                :policy_type => 'Registry Values',
+                :reg_type => '1',
+            },
+            'Interactive logon: Prompt user to change password before expiration' => {
+                :name => 'MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Winlogon\PasswordExpiryWarning',
+                :policy_type => 'Registry Values',
+                :reg_type => '4',
+            },
+            'Interactive logon: Require Domain Controller authentication to unlock workstation' => {
+                :name => 'MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Winlogon\ForceUnlockLogon',
+                :policy_type => 'Registry Values',
+                :reg_type => '4',
+            },
+            'Interactive logon: Require smart card' => {
+                :name => 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\ScForceOption',
+                :policy_type => 'Registry Values',
+                :reg_type => '4',
+            },
+            'Interactive logon: Smart card removal behavior' => {
+                :name => 'MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Winlogon\ScRemoveOption',
+                :policy_type => 'Registry Values',
+                :reg_type => '1',
             },
             'Microsoft network client: Digitally sign communications (always)' => {
                 :name => 'MACHINE\System\CurrentControlSet\Services\LanmanWorkstation\Parameters\RequireSecuritySignature',
-                :reg_type => '4',
                 :policy_type => 'Registry Values',
+                :reg_type => '4',
             },
             'Microsoft network client: Digitally sign communications (if server agrees)' => {
                 :name => 'MACHINE\System\CurrentControlSet\Services\LanmanWorkstation\Parameters\EnableSecuritySignature',
-                :reg_type => '4',
                 :policy_type => 'Registry Values',
+                :reg_type => '4',
             },
             'Microsoft network client: Send unencrypted password to third-party SMB servers' => {
                 :name => 'MACHINE\System\CurrentControlSet\Services\LanmanWorkstation\Parameters\EnablePlainTextPassword',
-                :reg_type => '4',
                 :policy_type => 'Registry Values',
-            },
-            'Microsoft network server: Server SPN target name validation level' => {
-                :name => 'MACHINE\System\CurrentControlSet\Services\LanmanServer\Parameters\SmbServerNameHardeningLevel',
                 :reg_type => '4',
-                :policy_type => 'Registry Values',
             },
             'Microsoft network server: Amount of idle time required before suspending session' => {
                 :name => 'MACHINE\System\CurrentControlSet\Services\LanManServer\Parameters\AutoDisconnect',
@@ -831,95 +655,274 @@ class SecurityPolicy
             },
             'Microsoft network server: Digitally sign communications (always)' => {
                 :name => 'MACHINE\System\CurrentControlSet\Services\LanManServer\Parameters\RequireSecuritySignature',
-                :reg_type => '4',
                 :policy_type => 'Registry Values',
+                :reg_type => '4',
             },
             'Microsoft network server: Digitally sign communications (if client agrees)' => {
                 :name => 'MACHINE\System\CurrentControlSet\Services\LanManServer\Parameters\EnableSecuritySignature',
-                :reg_type => '4',
                 :policy_type => 'Registry Values',
+                :reg_type => '4',
             },
             'Microsoft network server: Disconnect clients when logon hours expire' => {
                 :name => 'MACHINE\System\CurrentControlSet\Services\LanManServer\Parameters\EnableForcedLogOff',
+                :policy_type => 'Registry Values',
                 :reg_type => '4',
-                :policy_type => 'Registry Values',
             },
-            'Network access: Named Pipes that can be accessed anonymously' => {
-                :name => 'MACHINE\System\CurrentControlSet\Services\LanManServer\Parameters\NullSessionPipes',
-                :reg_type => '7',
+            'Microsoft network server: Server SPN target name validation level' => {
+                :name => 'MACHINE\System\CurrentControlSet\Services\LanmanServer\Parameters\SmbServerNameHardeningLevel',
                 :policy_type => 'Registry Values',
-            },
-            'Network access: Shares that can be accessed anonymously' => {
-                :name => 'MACHINE\System\CurrentControlSet\Services\LanManServer\Parameters\NullSessionShares',
-                :reg_type => '7',
-                :policy_type => 'Registry Values',
+                :reg_type => '4',
             },
             'Network access: Do not allow anonymous enumeration of SAM accounts and shares' => {
                 :name => 'MACHINE\System\CurrentControlSet\Control\Lsa\RestrictAnonymous',
-                :reg_type => '4',
                 :policy_type => 'Registry Values',
+                :reg_type => '4',
             },
             'Network access: Do not allow anonymous enumeration of SAM accounts' => {
                 :name => 'MACHINE\System\CurrentControlSet\Control\Lsa\RestrictAnonymousSAM',
-                :reg_type => '4',
                 :policy_type => 'Registry Values',
+                :reg_type => '4',
+            },
+            'Network access: Do not allow storage of passwords and credentials for network authentication' => {
+                :name => 'MACHINE\System\CurrentControlSet\Control\Lsa\DisableDomainCreds',
+                :policy_type => 'Registry Values',
+                :reg_type => '4',
+            },
+            'Network access: Let Everyone permissions apply to anonymous users' => {
+                :name => 'MACHINE\System\CurrentControlSet\Control\Lsa\EveryoneIncludesAnonymous',
+                :policy_type => 'Registry Values',
+                :reg_type => '4',
+            },
+            'Network access: Named Pipes that can be accessed anonymously' => {
+                :name => 'MACHINE\System\CurrentControlSet\Services\LanManServer\Parameters\NullSessionPipes',
+                :policy_type => 'Registry Values',
+                :reg_type => '7',
             },
             'Network access: Remotely accessible registry paths and sub-paths' => {
                 :name => 'MACHINE\System\CurrentControlSet\Control\SecurePipeServers\Winreg\AllowedPaths\Machine',
-                :reg_type => '7',
                 :policy_type => 'Registry Values',
+                :reg_type => '7',
+            },
+            'Network access: Remotely accessible registry paths' => {
+                :name => 'MACHINE\System\CurrentControlSet\Control\SecurePipeServers\Winreg\AllowedExactPaths\Machine',
+                :policy_type => 'Registry Values',
+                :reg_type => '7',
             },
             'Network access: Restrict anonymous access to Named Pipes and Shares' => {
                 :name => 'MACHINE\System\CurrentControlSet\Services\LanManServer\Parameters\RestrictNullSessAccess',
-                :reg_type => '4',
                 :policy_type => 'Registry Values',
+                :reg_type => '4',
+            },
+            'Network access: Shares that can be accessed anonymously' => {
+                :name => 'MACHINE\System\CurrentControlSet\Services\LanManServer\Parameters\NullSessionShares',
+                :policy_type => 'Registry Values',
+                :reg_type => '7',
+            },
+            'Network access: Sharing and security model for local accounts' => {
+                :name => 'MACHINE\System\CurrentControlSet\Control\Lsa\ForceGuest',
+                :policy_type => 'Registry Values',
+                :reg_type => '4',
+            },
+            'Network security: All Local System to use computer identity for NTLM' => {
+                :name => 'MACHINE\System\CurrentControlSet\Control\Lsa\UseMachineId',
+                :policy_type => 'Registry Values',
+                :reg_type => '4',
             },
             'Network security: Do not store LAN Manager hash value on next password change' => {
                 :name => 'MACHINE\System\CurrentControlSet\Control\Lsa\NoLMHash',
-                :reg_type => '4',
                 :policy_type => 'Registry Values',
+                :reg_type => '4',
             },
             'Network security: LAN Manager authentication level' => {
                 :name => 'MACHINE\System\CurrentControlSet\Control\Lsa\LmCompatibilityLevel',
-                :reg_type => '4',
                 :policy_type => 'Registry Values',
-            },
-            'Network security: Minimum session security for NTLM SSP based (including secure RPC) clients' => {
-                :name => 'MACHINE\System\CurrentControlSet\Control\Lsa\MSV1_0\NTLMMinClientSec',
                 :reg_type => '4',
-                :policy_type => 'Registry Values',
-            },
-            'Network security: Minimum session security for NTLM SSP based (including secure RPC) servers' => {
-                :name => 'MACHINE\System\CurrentControlSet\Control\Lsa\MSV1_0\NTLMMinServerSec',
-                :reg_type => '4',
-                :policy_type => 'Registry Values',
             },
             'Network security: LDAP client signing requirements' => {
                 :name => 'MACHINE\System\CurrentControlSet\Services\LDAP\LDAPClientIntegrity',
-                :reg_type => "4",
-                :policy_type => "Registry Values",
+                :policy_type => 'Registry Values',
+                :reg_type => '4',
             },
-            'System objects: Require case insensitivity for non-Windows subsystems' => {
-                :name => 'MACHINE\System\CurrentControlSet\Control\Session Manager\Kernel\ObCaseInsensitive',
-                :policy_type => "Registry Values",
-                :reg_type => "4"
+            'Network security: Minimum session security for NTLM SSP based (including secure RPC) clients' => {
+                :name => 'MACHINE\System\CurrentControlSet\Control\Lsa\MSV1_0\NTLMMinClientSec',
+                :policy_type => 'Registry Values',
+                :reg_type => '4',
             },
-            'System objects: Strengthen default permissions of internal system objects (e.g., Symbolic Links)' => {
-                :name => 'MACHINE\System\CurrentControlSet\Control\Session Manager\ProtectionMode',
-                :policy_type => "Registry Values",
-                :reg_type => "4"
+            'Network security: Minimum session security for NTLM SSP based (including secure RPC) servers' => {
+                :name => 'MACHINE\System\CurrentControlSet\Control\Lsa\MSV1_0\NTLMMinServerSec',
+                :policy_type => 'Registry Values',
+                :reg_type => '4',
             },
-            'System settings: Optional subsystems' => {
-                :name => 'MACHINE\System\CurrentControlSet\Control\Session Manager\SubSystems\optional',
-                :policy_type => "Registry Values",
-                :reg_type => "7"
+            'Recovery console: Allow automatic administrative logon' => {
+                :name => 'MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Setup\RecoveryConsole\SecurityLevel',
+                :policy_type => 'Registry Values',
+                :reg_type => '4',
+            },
+            'Recovery console: Allow floppy copy and access to all drives and all folders' => {
+                :name => 'MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Setup\RecoveryConsole\SetCommand',
+                :policy_type => 'Registry Values',
+                :reg_type => '4',
+            },
+            'Shutdown: Allow system to be shut down without having to log on' => {
+                :name => 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\ShutdownWithoutLogon',
+                :policy_type => 'Registry Values',
+                :reg_type => '4',
             },
             'Shutdown: Clear virtual memory pagefile' => {
                 :name => 'MACHINE\System\CurrentControlSet\Control\Session Manager\Memory Management\ClearPageFileAtShutdown',
-                :policy_type => "Registry Values",
-                :reg_type => "4"
+                :policy_type => 'Registry Values',
+                :reg_type => '4',
             },
-
+            'System cryptography: Force strong key protection for user keys stored on the computer' => {
+                :name => 'MACHINE\Software\Policies\Microsoft\Cryptography\ForceKeyProtection',
+                :policy_type => 'Registry Values',
+                :reg_type => '4',
+            },
+            'System cryptography: Use FIPS compliant algorithms for encryption, hashing, and signing' => {
+                :name => 'MACHINE\System\CurrentControlSet\Control\Lsa\FIPSAlgorithmPolicy\Enabled',
+                :policy_type => 'Registry Values',
+                :reg_type => '4',
+            },
+            'System objects: Require case insensitivity for non-Windows subsystems' => {
+                :name => 'MACHINE\System\CurrentControlSet\Control\Session Manager\Kernel\ObCaseInsensitive',
+                :policy_type => 'Registry Values',
+                :reg_type => '4',
+            },
+            'System objects: Strengthen default permissions of internal system objects (e.g., Symbolic Links)' => {
+                :name => 'MACHINE\System\CurrentControlSet\Control\Session Manager\ProtectionMode',
+                :policy_type => 'Registry Values',
+                :reg_type => '4',
+            },
+            'System settings: Optional subsystems' => {
+                :name => 'MACHINE\System\CurrentControlSet\Control\Session Manager\SubSystems\optional',
+                :policy_type => 'Registry Values',
+                :reg_type => '7',
+            },
+            'System settings: Use Certificate Rules on Windows Executables for Software Restriction Policies' => {
+                :name => 'MACHINE\Software\Policies\Microsoft\Windows\Safer\CodeIdentifiers\AuthenticodeEnabled',
+                :policy_type => 'Registry Values',
+                :reg_type => '4',
+            },
+            'User Account Control: Admin Approval Mode for the Built-in Administrator account' => {
+                :name => 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\FilterAdministratorToken',
+                :policy_type => 'Registry Values',
+                :reg_type => '4',
+            },
+            'User Account Control: Allow UIAccess applications to prompt for elevation without using the secure desktop' => {
+                :name => 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\EnableUIADesktopToggle',
+                :policy_type => 'Registry Values',
+                :reg_type => '4',
+            },
+            'User Account Control: Behavior of the elevation prompt for administrators in Admin Approval Mode' => {
+                :name => 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\ConsentPromptBehaviorAdmin',
+                :policy_type => 'Registry Values',
+                :reg_type => '4',
+            },
+            'User Account Control: Behavior of the elevation prompt for standard users' => {
+                :name => 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\ConsentPromptBehaviorUser',
+                :policy_type => 'Registry Values',
+                :reg_type => '4',
+            },
+            'User Account Control: Detect application installations and prompt for elevation' => {
+                :name => 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\EnableInstallerDetection',
+                :policy_type => 'Registry Values',
+                :reg_type => '4',
+            },
+            'User Account Control: Only elevate UIAccess applications that are installed in secure locations' => {
+                :name => 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\EnableSecureUIAPaths',
+                :policy_type => 'Registry Values',
+                :reg_type => '4',
+            },
+            'User Account Control: Only elevate executables that are signed and validated' => {
+                :name => 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\ValidateAdminCodeSignatures',
+                :policy_type => 'Registry Values',
+                :reg_type => '4',
+            },
+            'User Account Control: Run all administrators in Admin Approval Mode' => {
+                :name => 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\EnableLUA',
+                :policy_type => 'Registry Values',
+                :reg_type => '4',
+            },
+            'User Account Control: Switch to the secure desktop when prompting for elevation' => {
+                :name => 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\PromptOnSecureDesktop',
+                :policy_type => 'Registry Values',
+                :reg_type => '4',
+            },
+            'User Account Control: Virtualize file and registry write failures to per-user locations' => {
+                :name => 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\EnableVirtualization',
+                :policy_type => 'Registry Values',
+                :reg_type => '4',
+            },
+            # System Access
+            'Account lockout duration' => {
+                :name => 'LockoutDuration',
+                :policy_type => 'System Access',
+            },
+            'Account lockout threshold' => {
+                :name => 'LockoutBadCount',
+                :policy_type => 'System Access',
+            },
+            'Accounts: Administrator account status' => {
+                :name => 'EnableAdminAccount',
+                :policy_type => 'System Access',
+            },
+            'Accounts: Rename administrator account' => {
+                :name => 'NewAdministratorName',
+                :policy_type => 'System Access',
+                :data_type => :quoted_string,
+            },
+            'Accounts: Rename guest account' => {
+                :name => 'NewGuestName',
+                :policy_type => 'System Access',
+                :data_type => :quoted_string,
+            },
+            'Accounts: Require Login to Change Password' => {
+                :name => 'RequireLogonToChangePassword',
+                :policy_type => 'System Access',
+            },
+            'EnableAdminAccount' => {
+                :name => 'EnableAdminAccount',
+                :policy_type => 'System Access',
+            },
+            'EnableGuestAccount' => {
+                :name=>'EnableGuestAccount',
+                :policy_type => 'System Access',
+            },
+            'Enforce password history' => {
+                :name => 'PasswordHistorySize',
+                :policy_type => 'System Access',
+            },
+            'Maximum password age' => {
+                :name => 'MaximumPasswordAge',
+                :policy_type => 'System Access',
+            },
+            'Minimum password age' => {
+                :name => 'MinimumPasswordAge',
+                :policy_type => 'System Access',
+            },
+            'Minimum password length' => {
+                :name => 'MinimumPasswordLength',
+                :policy_type => 'System Access',
+            },
+            'Network access: Allow anonymous SID/name translation' => {
+                :name => 'LSAAnonymousNameLookup',
+                :policy_type => 'System Access',
+            },
+            'Network security: Force logoff when logon hours expire' => {
+                :name => 'ForceLogoffWhenHourExpire',
+                :policy_type => 'System Access'            },
+            'Password must meet complexity requirements' => {
+                :name => 'PasswordComplexity',
+                :policy_type => 'System Access',
+            },
+            'Reset account lockout counter after' => {
+                :name => 'ResetLockoutCount',
+                :policy_type => 'System Access',
+            },
+            'Store passwords using reversible encryption' => {
+                :name => 'ClearTextPassword',
+                :policy_type => 'System Access',
+            },
         }
     end
 end
