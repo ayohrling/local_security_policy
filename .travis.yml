@@ -1,14 +1,21 @@
-branches:
-script: "bundle exec rake spec SPEC_OPTS='--format documentation'"
+---
+
+before_install:
+  - rm -f Gemfile.lock
+
 bundler_args: --without development
 
-rvm:
-- 1.9.3
-- 2.0.0
-- 2.1.5
-- 2.2.0
-env:
-  matrix:
-    - PUPPET_GEM_VERSION="~> 3.2"
-    - PUPPET_GEM_VERSION="~> 3.7"
+cache: bundler
+
+matrix:
+  include:
+    - env: PUPPET_GEM_VERSION="~> 4.10"
+      rvm: 2.1.9
+    - env: PUPPET_GEM_VERSION="~> 5.5"
+      rvm: 2.4.5
+    - env: PUPPET_GEM_VERSION="~> 6.0"
+      rvm: 2.5.1
+
+script:
+  - bundle exec rake spec SPEC_OPTS='--format documentation'
 
