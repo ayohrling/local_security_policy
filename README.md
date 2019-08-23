@@ -271,6 +271,13 @@ Currently for data_type there is only `:quoted_string`.  However, for reg_type(i
     REG_QWORD 11
     REG_QWORD_LITTLE_ENDIAN 11
 ```
+## Useful lookup tools:
+
+The following online tools have been useful in finding and adding new policy mappings:
+
+- https://getadmx.com
+- https://gpsearch.azurewebsites.net
+
 ## Commands Used
 
 ## TODO: Future release
