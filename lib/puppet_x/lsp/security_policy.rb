@@ -498,6 +498,11 @@ class SecurityPolicy
                 :policy_type => 'Registry Values',
                 :reg_type => '4',
             },
+            'Allow Online Tips' => {
+                :name => 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer\AllowOnlineTips',
+                :policy_type => 'Registry Values',
+                :reg_type => '4',
+            },
             'Allow users to enable online speech recognition services' => {
                 :name => 'MACHINE\Software\Policies\Microsoft\InputPersonalization\AllowInputPersonalization',
                 :policy_type => 'Registry Values',
