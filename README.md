@@ -132,6 +132,7 @@ local_security_policy { 'System cryptography: Use FIPS compiant algorithms for e
       Domain member: Maximum machine account password age
       Domain member: Require strong (Windows 2000 or later) session key
       Enable computer and user accounts to be trusted for delegation
+      Enable Local Admin Password Management
       EnableAdminAccount
       Enforce password history
       Force shutdown from a remote system

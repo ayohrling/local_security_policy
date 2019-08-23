@@ -588,6 +588,11 @@ class SecurityPolicy
                 :policy_type => 'Registry Values',
                 :reg_type => '4',
             },
+            'Enable Local Admin Password Management' => 
+                :name => 'MACHINE\Software\Policies\Microsoft Services\AdmPwd\AdmPwdEnabled',
+                :policy_type => 'Registry Values',
+                :reg_type => '4',
+            },
             'Interactive logon: Display user information when the session is locked' => {
                 :name => 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\DontDisplayLockedUserId',
                 :policy_type => 'Registry Values',
