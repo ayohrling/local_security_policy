@@ -212,6 +212,7 @@ local_security_policy { 'System cryptography: Use FIPS compiant algorithms for e
       System settings: Optional subsystems
       System settings: Use Certificate Rules on Windows Executables for Software Restriction Policies
       Take ownership of files or other objects
+      Turn on Windows Defender protection against Potentially Unwanted Applications
       User Account Control: Admin Approval Mode for the Built-in Administrator account
       User Account Control: Allow UIAccess applications to prompt for elevation without using the secure desktop
       User Account Control: Behavior of the elevation prompt for administrators in Admin Approval Mode
