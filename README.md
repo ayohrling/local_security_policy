@@ -124,6 +124,7 @@ local_security_policy { 'System cryptography: Use FIPS compiant algorithms for e
       Devices: Prevent users from installing printer drivers
       Devices: Restrict CD-ROM access to locally logged-on user only
       Devices: Restrict floppy access to locally logged-on user only
+      Do not allow password expiration time longer than required by policy
       Domain member: Digitally encrypt or sign secure channel data (always)
       Domain member: Digitally encrypt secure channel data (when possible)
       Domain member: Digitally sign secure channel data (when possible)

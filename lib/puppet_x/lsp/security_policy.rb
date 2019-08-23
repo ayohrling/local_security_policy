@@ -553,6 +553,11 @@ class SecurityPolicy
                 :policy_type => 'Registry Values',
                 :reg_type => '1',
             },
+            'Do not allow password expiration time longer than required by policy' => {
+                :name=> 'MACHINE\Software\Policies\Microsoft Services\AdmPwd\PwdExpirationProtectionEnabled',
+                :policy_type => 'Registry Values',
+                :reg_type => '1',
+            },
             'Domain member: Digitally encrypt or sign secure channel data (always)' => {
                 :name => 'MACHINE\System\CurrentControlSet\Services\Netlogon\Parameters\RequireSignOrSeal',
                 :policy_type => 'Registry Values',
