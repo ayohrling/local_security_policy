@@ -200,6 +200,7 @@ local_security_policy { 'System cryptography: Use FIPS compiant algorithms for e
       Network security: Minimum session security for NTLM SSP based (including secure RPC) clients
       Network security: Minimum session security for NTLM SSP based (including secure RPC) servers
       Password must meet complexity requirements
+      PCHealth Error Reporting
       Perform volume maintenance tasks
       Prevent enabling lock screen camera
       Prevent enabling lock screen slide show
@@ -229,6 +230,7 @@ local_security_policy { 'System cryptography: Use FIPS compiant algorithms for e
       Turn off the "Publish to Web" task for files and folders
       Turn off the Windows Messenger Customer Experience Improvement Program
       Turn off Windows Customer Experience Improvement Program
+      Turn off Windows Error Reporting
       Turn on Windows Defender protection against Potentially Unwanted Applications
       User Account Control: Admin Approval Mode for the Built-in Administrator account
       User Account Control: Allow UIAccess applications to prompt for elevation without using the secure desktop

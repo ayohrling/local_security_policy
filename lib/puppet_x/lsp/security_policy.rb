@@ -828,6 +828,11 @@ class SecurityPolicy
                 :policy_type => 'Registry Values',
                 :reg_type => '4',
             },
+            'PCHealth Error Reporting' => {
+                :name => 'MACHINE\Software\Policies\Microsoft\PCHealth\ErrorReporting\DoReport',
+                :policy_type => 'Registry Values',
+                :reg_type => '4',
+            },
             'Prevent enabling lock screen camera' => {
                 :name => 'MACHINE\Software\Policies\Microsoft\Windows\Personalization\NoLockScreenCamera',
                 :policy_type => 'Registry Values',
@@ -914,6 +919,11 @@ class SecurityPolicy
             },
             'Turn off the Windows Customer Experience Improvement Program' => {
                 :name => 'MACHINE\Software\Policies\Microsoft\SQMClient\Windows\CEIPEnable',
+                :policy_type => 'Registry Values',
+                :reg_type => '4',
+            },
+            'Turn off Windows Error Reporting' => {
+                :name => 'MACHINE\Software\Policies\Microsoft\Windows\Windows Error Reporting\Disabled',
                 :policy_type => 'Registry Values',
                 :reg_type => '4',
             },
