@@ -912,6 +912,11 @@ class SecurityPolicy
                 :policy_type => 'Registry Values',
                 :reg_type => '4',
             },
+            'Turn off the Windows Customer Experience Improvement Program' => {
+                :name => 'MACHINE\Software\Policies\Microsoft\SQMClient\Windows\CEIPEnable',
+                :policy_type => 'Registry Values',
+                :reg_type => '4',
+            },
             'Turn on Windows Defender protection against Potentially Unwanted Applications' => {
                 :name => 'MACHINE\Software\Policies\Microsoft\Windows Defender\MpEngine\MpEnablePus',
                 :policy_type => 'Registry Values',
