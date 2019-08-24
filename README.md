@@ -226,6 +226,7 @@ local_security_policy { 'System cryptography: Use FIPS compiant algorithms for e
       Take ownership of files or other objects
       Turn off Microsoft Peer-to-Peer Networking Services
       Turn off multicast name resolution
+      Turn off the "Publish to Web" task for files and folders
       Turn on Windows Defender protection against Potentially Unwanted Applications
       User Account Control: Admin Approval Mode for the Built-in Administrator account
       User Account Control: Allow UIAccess applications to prompt for elevation without using the secure desktop

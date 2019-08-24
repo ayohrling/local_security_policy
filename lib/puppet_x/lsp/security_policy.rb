@@ -902,6 +902,11 @@ class SecurityPolicy
                 :policy_type => 'Registry Values',
                 :reg_type => '4',
             },
+            'Turn off the "Publish to Web" task for files and folders' => {
+                :name => 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer\NoPublishingWizard',
+                :policy_type => 'Registry Values',
+                :reg_type => '4',
+            },
             'Turn on Windows Defender protection against Potentially Unwanted Applications' => {
                 :name => 'MACHINE\Software\Policies\Microsoft\Windows Defender\MpEngine\MpEnablePus',
                 :policy_type => 'Registry Values',
