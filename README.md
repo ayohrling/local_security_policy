@@ -134,6 +134,7 @@ local_security_policy { 'System cryptography: Use FIPS compiant algorithms for e
       Domain member: Require strong (Windows 2000 or later) session key
       Enable computer and user accounts to be trusted for delegation
       Enable Font Providers
+      Enable insecure guest logons
       Enable Local Admin Password Management
       EnableAdminAccount
       Enforce password history
