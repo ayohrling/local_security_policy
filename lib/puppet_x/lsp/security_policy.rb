@@ -888,6 +888,11 @@ class SecurityPolicy
                 :policy_type => 'Registry Values',
                 :reg_type => '4',
             },
+            'WDigest Authentication' => {
+                :name => 'MACHINE\System\CurrentControlSet\Control\SecurityProviders\WDigest\UseLogonCredential',
+                :policy_type => 'Registry Values',
+                :reg_type => '4',
+            },
             # System Access
             'Account lockout duration' => {
                 :name => 'LockoutDuration',

@@ -223,7 +223,7 @@ local_security_policy { 'System cryptography: Use FIPS compiant algorithms for e
       User Account Control: Run all administrators in Admin Approval Mode
       User Account Control: Switch to the secure desktop when prompting for elevation
       User Account Control: Virtualize file and registry write failures to per-user locations
-
+      WDigest Authentication
 
 
 ## How this works
