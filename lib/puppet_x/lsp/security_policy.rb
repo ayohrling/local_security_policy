@@ -528,6 +528,11 @@ class SecurityPolicy
                 :policy_type => 'Registry Values',
                 :reg_type => '4',
             },
+            'Boot-Start Driver Initialization Policy' => {
+                :name => 'MACHINE\System\CurrentControlSet\Policies\EarlyLaunch\DriverLoadPolicy',
+                :policy_type => 'Registry Values',
+                :reg_type => '4',
+            },
             'Devices: Allow undock without having to log on' => {
                 :name => 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\UndockWithoutLogon',
                 :policy_type => 'Registry Values',
