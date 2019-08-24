@@ -109,6 +109,7 @@ local_security_policy { 'System cryptography: Use FIPS compiant algorithms for e
       Bypass traverse checking
       Change the system time
       Change the time zone
+      Configure registry policy processing:  Do not apply during periodic background processing
       Create a pagefile
       Create a token object
       Create global objects
