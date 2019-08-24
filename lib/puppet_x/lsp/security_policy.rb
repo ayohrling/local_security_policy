@@ -693,6 +693,11 @@ class SecurityPolicy
                 :policy_type => 'Registry Values',
                 :reg_type => '4',
             },
+            'MSS: (AutoAdminLogon) Enable Automatic Logon (not recommended)' => {
+                :name => 'MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Winlogon\AutoAdminLogon',
+                :policy_type => 'Registry Values',
+                :reg_type => '4',
+            },
             'Network access: Do not allow anonymous enumeration of SAM accounts and shares' => {
                 :name => 'MACHINE\System\CurrentControlSet\Control\Lsa\RestrictAnonymous',
                 :policy_type => 'Registry Values',

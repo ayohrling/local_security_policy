@@ -170,6 +170,7 @@ local_security_policy { 'System cryptography: Use FIPS compiant algorithms for e
       Minimum password length
       Modify an object label
       Modify firmware environment values
+      MSS: (AutoAdminLogon) Enable Automatic Logon (not recommended)
       Network access: Allow anonymous SID/name translation
       Network access: Do not allow anonymous enumeration of SAM accounts
       Network access: Do not allow anonymous enumeration of SAM accounts and shares
