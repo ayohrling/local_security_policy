@@ -703,6 +703,11 @@ class SecurityPolicy
                 :policy_type => 'Registry Values',
                 :reg_type => '4',
             },
+            'MSS: (ScreenSaverGracePeriod) The time in seconds before the screen saver grace period expires (0 recommended)' => {
+                :name => 'MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Winlogon\ScreenSaverGracePeriod',
+                :policy_type => 'Registry Values',
+                :reg_type => '1',
+            },
             'Network access: Do not allow anonymous enumeration of SAM accounts and shares' => {
                 :name => 'MACHINE\System\CurrentControlSet\Control\Lsa\RestrictAnonymous',
                 :policy_type => 'Registry Values',
