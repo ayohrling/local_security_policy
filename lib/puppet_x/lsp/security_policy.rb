@@ -553,6 +553,11 @@ class SecurityPolicy
                 :policy_type => 'Registry Values',
                 :reg_type => '1',
             },
+            'Disable IPv6' => {
+                :name => 'MACHINE\System\CurrentControlSet\Services\TCPIP6\Parameters\DisabledComponents',
+                :policy_type => 'Registry Values',
+                :reg_type => '4',
+            },
             'Do not allow password expiration time longer than required by policy' => {
                 :name=> 'MACHINE\Software\Policies\Microsoft Services\AdmPwd\PwdExpirationProtectionEnabled',
                 :policy_type => 'Registry Values',
