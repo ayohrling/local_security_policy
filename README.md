@@ -111,6 +111,7 @@ local_security_policy { 'System cryptography: Use FIPS compiant algorithms for e
       Change the time zone
       Configure registry policy processing:  Do not apply during periodic background processing
       Configure registry policy processing:  Process even if the Group Policy objects have not changed
+      Continue experiences on this device
       Create a pagefile
       Create a token object
       Create global objects

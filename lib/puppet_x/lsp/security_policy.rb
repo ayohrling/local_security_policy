@@ -543,6 +543,11 @@ class SecurityPolicy
                 :policy_type => 'Registry Values',
                 :reg_type => '4',
             },
+            'Continue experiences on this device' => {
+                :name => 'MACHINE\Software\Policies\Microsoft\Windows\System\EnableCdp',
+                :policy_type => 'Registry Values',
+                :reg_type => '4',
+            },
             'Devices: Allow undock without having to log on' => {
                 :name => 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\UndockWithoutLogon',
                 :policy_type => 'Registry Values',
