@@ -171,6 +171,7 @@ local_security_policy { 'System cryptography: Use FIPS compiant algorithms for e
       Modify an object label
       Modify firmware environment values
       MSS: (AutoAdminLogon) Enable Automatic Logon (not recommended)
+      MSS: (SafeDllSearchMode) Enable Safe DLL search mode (recommended)
       Network access: Allow anonymous SID/name translation
       Network access: Do not allow anonymous enumeration of SAM accounts
       Network access: Do not allow anonymous enumeration of SAM accounts and shares
