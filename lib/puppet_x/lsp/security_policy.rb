@@ -848,6 +848,11 @@ class SecurityPolicy
                 :policy_type => 'Registry Values',
                 :reg_type => '4',
             },
+            'Turn off Microsoft Peer-to-Peer Networking Services' => {
+                :name => 'MACHINE\Software\Policies\Microsoft\Peernet\Disabled',
+                :policy_type => 'Registry Values',
+                :reg_type => '4',
+            },
             'Turn on Windows Defender protection against Potentially Unwanted Applications' => {
                 :name => 'MACHINE\Software\Policies\Microsoft\Windows Defender\MpEngine\MpEnablePus',
                 :policy_type => 'Registry Values',
