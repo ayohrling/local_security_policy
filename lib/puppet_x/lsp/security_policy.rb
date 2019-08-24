@@ -538,6 +538,11 @@ class SecurityPolicy
                 :policy_type => 'Registry Values',
                 :reg_type => '4',
             },
+            'Configure registry policy processing:  Process even if the Group Policy objects have not changed' => {
+                :name => 'MACHINE\Software\Policies\Microsoft\Windows\Group Policy\{35378EAC-683F-11D2-A89A-00C04FBBCFA2}\NoBackgroundPolicy',
+                :policy_type => 'Registry Values',
+                :reg_type => '4',
+            },
             'Devices: Allow undock without having to log on' => {
                 :name => 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\UndockWithoutLogon',
                 :policy_type => 'Registry Values',
