@@ -593,6 +593,11 @@ class SecurityPolicy
                 :policy_type => 'Registry Values',
                 :reg_type => '4',
             },
+            'Enable Font Providers' =>
+                :name => 'MACHINE\Software\Policies\Microsoft\Windows\System\EnableFontProviders',
+                :policy_type => 'Registry Values',
+                :reg_type => '4',
+            },
             'Enable Local Admin Password Management' => 
                 :name => 'MACHINE\Software\Policies\Microsoft Services\AdmPwd\AdmPwdEnabled',
                 :policy_type => 'Registry Values',
