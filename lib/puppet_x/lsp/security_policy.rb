@@ -897,6 +897,11 @@ class SecurityPolicy
                 :policy_type => 'Registry Values',
                 :reg_type => '4',
             },
+            'Turn off handwriting recognition error reporting' => {
+                :name => 'MACHINE\Software\Policies\Microsoft\Windows\HandwritingErrorReports\PreventHandwritingErrorReports',
+                :policy_type => 'Registry Values',
+                :reg_type => '4',
+            },
             'Turn off Microsoft Peer-to-Peer Networking Services' => {
                 :name => 'MACHINE\Software\Policies\Microsoft\Peernet\Disabled',
                 :policy_type => 'Registry Values',
