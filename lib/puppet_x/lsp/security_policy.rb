@@ -548,6 +548,11 @@ class SecurityPolicy
                 :policy_type => 'Registry Values',
                 :reg_type => '4',
             },
+            'Device authentication behavior using certificate' => {
+                :name => 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\Kerberos\Parameters\DevicePKInitBehavior'
+                :policy_type => 'Registry Values',
+                :reg_type => '4',
+            },
             'Devices: Allow undock without having to log on' => {
                 :name => 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\UndockWithoutLogon',
                 :policy_type => 'Registry Values',
