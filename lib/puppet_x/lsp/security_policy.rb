@@ -498,6 +498,11 @@ class SecurityPolicy
                 :policy_type => 'Registry Values',
                 :reg_type => '4',
             },
+            'Allow network connectivity during connected-standby (on battery)' => {
+                :name => 'MACHINE\Software\Policies\Microsoft\Power\PowerSettings\f15576e8-98b7-4186-b944-eafa664402d9\DCSettingIndex',
+                :policy_type => 'Registry Values',
+                :reg_type => '4',
+            },
             'Allow Online Tips' => {
                 :name => 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer\AllowOnlineTips',
                 :policy_type => 'Registry Values',

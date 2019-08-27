@@ -89,6 +89,7 @@ local_security_policy { 'System cryptography: Use FIPS compiant algorithms for e
       Adjust memory quotas for a process
       Allow log on locally
       Allow log on through Remote Desktop Services
+      Allow network connectivity during connected-standby (on battery)
       Allow Online Tips
       Allow users to enable online speech recognition services
       Audit account logon events
