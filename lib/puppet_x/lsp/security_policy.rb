@@ -922,6 +922,11 @@ class SecurityPolicy
                 :policy_type => 'Registry Values',
                 :reg_type => '4',
             },
+            'Turn off Search Companion content file updates' => {
+                :name => 'MACHINE\Software\Policies\Microsoft\SearchCompanion\DisableContentFileUpdates',
+                :policy_type => 'Registry Values',
+                :reg_type => '4',
+            },
             'Turn off the "Publish to Web" task for files and folders' => {
                 :name => 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer\NoPublishingWizard',
                 :policy_type => 'Registry Values',

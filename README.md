@@ -230,6 +230,7 @@ local_security_policy { 'System cryptography: Use FIPS compiant algorithms for e
       Turn off Microsoft Peer-to-Peer Networking Services
       Turn off multicast name resolution
       Turn off Registration if URL connection is referring to Microsoft.com
+      Turn off Search Companion content file updates
       Turn off the "Publish to Web" task for files and folders
       Turn off the Windows Messenger Customer Experience Improvement Program
       Turn off Windows Customer Experience Improvement Program
