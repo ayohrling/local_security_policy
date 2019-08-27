@@ -528,6 +528,11 @@ class SecurityPolicy
                 :policy_type => 'Registry Values',
                 :reg_type => '4',
             },
+            'Block user from showing account details on sign-in' => {
+                :name => 'MACHINE\Software\Policies\Microsoft\Windows\System\BlockUserFromShowingAccountDetailsOnSignin',
+                :policy_type => 'Registry Values',
+                :reg_type => '4',
+            },
             'Boot-Start Driver Initialization Policy' => {
                 :name => 'MACHINE\System\CurrentControlSet\Policies\EarlyLaunch\DriverLoadPolicy',
                 :policy_type => 'Registry Values',

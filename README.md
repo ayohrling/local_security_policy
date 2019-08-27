@@ -105,6 +105,7 @@ local_security_policy { 'System cryptography: Use FIPS compiant algorithms for e
       Audit: Force audit policy subcategory settings (Windows Vista or later) to override audit policy category settings
       Audit: Shut down system immediately if unable to log security audits
       Back up files and directories
+      Block user from showing account details on sign-in
       Boot-Start Driver Initialization Policy
       Bypass traverse checking
       Change the system time
