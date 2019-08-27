@@ -977,6 +977,11 @@ class SecurityPolicy
                 :policy_type => 'Registry Values',
                 :reg_type => '4',
             },
+            'Untrusted Font Blocking' => {
+                :name => 'MACHINE\Software\Policies\Microsoft\Windows Defender\MpEngine\MpEnablePus',
+                :policy_type => 'Registry Values',
+                :reg_type => '1',
+            },
             'User Account Control: Admin Approval Mode for the Built-in Administrator account' => {
                 :name => 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\FilterAdministratorToken',
                 :policy_type => 'Registry Values',
