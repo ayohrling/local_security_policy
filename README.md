@@ -148,6 +148,7 @@ local_security_policy { 'System cryptography: Use FIPS compiant algorithms for e
       Force shutdown from a remote system
       Generate security audits
       Impersonate a client after authentication
+      Include command line in process creation events
       Increase a process working set
       Increase scheduling priority
       Interactive logon: Display user information when the session is locked

@@ -643,6 +643,11 @@ class SecurityPolicy
                 :policy_type => 'Registry Values',
                 :reg_type => '4',
             },
+            'Include command line in process creation events' => {
+                :name => 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\Audit\ProcessCreationIncludeCmdLine_Enabled',
+                :policy_type => 'Registry Values',
+                :reg_type => '4',
+            },
             'Interactive logon: Display user information when the session is locked' => {
                 :name => 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\DontDisplayLockedUserId',
                 :policy_type => 'Registry Values',
