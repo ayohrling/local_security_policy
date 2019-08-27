@@ -216,6 +216,7 @@ local_security_policy { 'System cryptography: Use FIPS compiant algorithms for e
       Shut down the system
       Shutdown: Allow system to be shut down without having to log on
       Shutdown: Clear virtual memory pagefile
+      Support device authentication using certificate
       Store passwords using reversible encryption
       Synchronize directory service data
       System cryptography: Force strong key protection for user keys stored on the computer

@@ -867,6 +867,11 @@ class SecurityPolicy
                 :policy_type => 'Registry Values',
                 :reg_type => '4',
             },
+            'Support device authentication using certificate' => {
+                :name => 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\Kerberos\Parameters\DevicePKInitEnabled',
+                :policy_type => 'Registry Values',
+                :reg_type => '4',
+            },
             'System cryptography: Force strong key protection for user keys stored on the computer' => {
                 :name => 'MACHINE\Software\Policies\Microsoft\Cryptography\ForceKeyProtection',
                 :policy_type => 'Registry Values',
