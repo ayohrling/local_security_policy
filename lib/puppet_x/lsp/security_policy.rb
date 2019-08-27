@@ -937,6 +937,11 @@ class SecurityPolicy
                 :policy_type => 'Registry Values',
                 :reg_type => '4',
             },
+            'Turn off picture password sign-in' => {
+                :name => 'MACHINE\Software\Policies\Microsoft\Windows\System\BlockDomainPicturePassword',
+                :policy_type => 'Registry Values',
+                :reg_type => '4',
+            },
             'Turn off Registration if URL connection is referring to Microsoft.com' => {
                 :name => 'MACHINE\Software\Policies\Microsoft\Windows\Registration Wizard Control\NoRegistration',
                 :policy_type => 'Registry Values',

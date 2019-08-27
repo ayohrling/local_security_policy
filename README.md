@@ -233,6 +233,7 @@ local_security_policy { 'System cryptography: Use FIPS compiant algorithms for e
       Turn off Internet Connection Wizard if URL connection is referring to Microsoft.com
       Turn off Microsoft Peer-to-Peer Networking Services
       Turn off multicast name resolution
+      Turn off picture password sign-in
       Turn off Registration if URL connection is referring to Microsoft.com
       Turn off Search Companion content file updates
       Turn off the "Publish to Web" task for files and folders
