@@ -226,6 +226,7 @@ local_security_policy { 'System cryptography: Use FIPS compiant algorithms for e
       System settings: Use Certificate Rules on Windows Executables for Software Restriction Policies
       Take ownership of files or other objects
       Turn off handwriting recognition error reporting
+      Turn off Internet Connection Wizard if URL connection is referring to Microsoft.com
       Turn off Microsoft Peer-to-Peer Networking Services
       Turn off multicast name resolution
       Turn off the "Publish to Web" task for files and folders

@@ -902,6 +902,11 @@ class SecurityPolicy
                 :policy_type => 'Registry Values',
                 :reg_type => '4',
             },
+            'Turn off Internet Connection Wizard if URL connection is referring to Microsoft.com' => {
+                :name => 'MACHINE\Software\Policies\Microsoft\Windows\Internet Connection Wizard\ExitOnMSICW',
+                :policy_type => 'Registry Values',
+                :reg_type => '4',
+            },
             'Turn off Microsoft Peer-to-Peer Networking Services' => {
                 :name => 'MACHINE\Software\Policies\Microsoft\Peernet\Disabled',
                 :policy_type => 'Registry Values',
