@@ -917,6 +917,11 @@ class SecurityPolicy
                 :policy_type => 'Registry Values',
                 :reg_type => '4',
             },
+            'Turn off Registration if URL connection is referring to Microsoft.com' => {
+                :name => 'MACHINE\Software\Policies\Microsoft\Windows\Registration Wizard Control\NoRegistration',
+                :policy_type => 'Registry Values',
+                :reg_type => '4',
+            },
             'Turn off the "Publish to Web" task for files and folders' => {
                 :name => 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer\NoPublishingWizard',
                 :policy_type => 'Registry Values',
