@@ -73,18 +73,10 @@ Puppet::Type.newtype(:local_security_policy) do
     desc 'Local Security Policy Setting Value'
     validate do |value|
       case resource[:policy_type].to_s
-        when 'Privilege Rights'
-          if value.nil? || value.empty?
-            raise ArgumentError, "Value cannot be nil or empty.  Use \'Ensure => absent\' instead"
-          end
-          # maybe validate some sort of user?
-        when 'Event Audit'
-          raise ArgumentError, "Invalid Event type: #{value} for #{resource[:policy_value]}" unless SecurityPolicy::EVENT_TYPES.include?(value)
-        when 'Registry Values'
-          # maybe validate the value based on the datatype?
-
-      case resource[:policy_type].to_s
       when 'Privilege Rights'
+        if value.nil? || value.empty?
+          raise ArgumentError, "Value cannot be nil or empty.  Use \'Ensure => absent\' instead"
+        end
         # maybe validate some sort of user?
       when 'Event Audit'
         raise ArgumentError, "Invalid Event type: #{value} for #{resource[:policy_value]}" unless SecurityPolicy::EVENT_TYPES.include?(value)
