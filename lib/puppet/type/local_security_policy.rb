@@ -75,7 +75,7 @@ Puppet::Type.newtype(:local_security_policy) do
       case resource[:policy_type].to_s
         when 'Privilege Rights'
           if value.nil? || value.empty?
-            raise ArgumentError, "Value cannot be nil or empty.  Use \'Ensure => absent\' instead")
+            raise ArgumentError, "Value cannot be nil or empty.  Use \'Ensure => absent\' instead"
           end
           # maybe validate some sort of user?
         when 'Event Audit'
