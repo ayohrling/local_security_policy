@@ -89,23 +89,32 @@ local_security_policy { 'System cryptography: Use FIPS compiant algorithms for e
       Adjust memory quotas for a process
       Allow log on locally
       Allow log on through Remote Desktop Services
+      Allow network connectivity during connected-standby (on battery)
+      Allow network connectivity during connected-standby (plugged in)
+      Allow Online Tips
+      Allow users to enable online speech recognition services
       Audit account logon events
       Audit account management
-      Audit: Audit the access of global system objects
-      Audit: Audit the use of Backup and Restore privilege
       Audit directory service access
-      Audit: Force audit policy subcategory settings (Windows Vista or later) to override audit policy category settings
       Audit logon events
       Audit object access
       Audit policy change
       Audit privilege use
       Audit process tracking
-      Audit: Shut down system immediately if unable to log security audits
       Audit system events
+      Audit: Audit the access of global system objects
+      Audit: Audit the use of Backup and Restore privilege
+      Audit: Force audit policy subcategory settings (Windows Vista or later) to override audit policy category settings
+      Audit: Shut down system immediately if unable to log security audits
       Back up files and directories
+      Block user from showing account details on sign-in
+      Boot-Start Driver Initialization Policy
       Bypass traverse checking
       Change the system time
       Change the time zone
+      Configure registry policy processing:  Do not apply during periodic background processing
+      Configure registry policy processing:  Process even if the Group Policy objects have not changed
+      Continue experiences on this device
       Create a pagefile
       Create a token object
       Create global objects
@@ -117,23 +126,31 @@ local_security_policy { 'System cryptography: Use FIPS compiant algorithms for e
       Deny log on as a service
       Deny log on locally
       Deny log on through Remote Desktop Services
-      Devices: Allowed to format and eject removable media
       Devices: Allow undock without having to log on
+      Devices: Allowed to format and eject removable media
       Devices: Prevent users from installing printer drivers
       Devices: Restrict CD-ROM access to locally logged-on user only
+      Disable IPv6
+      Device authentication behavior using certificate
       Devices: Restrict floppy access to locally logged-on user only
+      Do not allow password expiration time longer than required by policy
+      Do not display network selection UI
       Domain member: Digitally encrypt or sign secure channel data (always)
       Domain member: Digitally encrypt secure channel data (when possible)
       Domain member: Digitally sign secure channel data (when possible)
       Domain member: Disable machine account password changes
       Domain member: Maximum machine account password age
       Domain member: Require strong (Windows 2000 or later) session key
-      EnableAdminAccount
       Enable computer and user accounts to be trusted for delegation
+      Enable Font Providers
+      Enable insecure guest logons
+      Enable Local Admin Password Management
+      EnableAdminAccount
       Enforce password history
       Force shutdown from a remote system
       Generate security audits
       Impersonate a client after authentication
+      Include command line in process creation events
       Increase a process working set
       Increase scheduling priority
       Interactive logon: Display user information when the session is locked
@@ -166,6 +183,10 @@ local_security_policy { 'System cryptography: Use FIPS compiant algorithms for e
       Minimum password length
       Modify an object label
       Modify firmware environment values
+      MSS: (AutoAdminLogon) Enable Automatic Logon (not recommended)
+      MSS: (SafeDllSearchMode) Enable Safe DLL search mode (recommended)
+      MSS: (ScreenSaverGracePeriod) The time in seconds before the screen saver grace period expires (0 recommended)
+      NetBIOS Node Type
       Network access: Allow anonymous SID/name translation
       Network access: Do not allow anonymous enumeration of SAM accounts
       Network access: Do not allow anonymous enumeration of SAM accounts and shares
@@ -185,7 +206,11 @@ local_security_policy { 'System cryptography: Use FIPS compiant algorithms for e
       Network security: Minimum session security for NTLM SSP based (including secure RPC) clients
       Network security: Minimum session security for NTLM SSP based (including secure RPC) servers
       Password must meet complexity requirements
+      PCHealth Error Reporting
       Perform volume maintenance tasks
+      Prevent enabling lock screen camera
+      Prevent enabling lock screen slide show
+      Prohibit use of Internet Connection Sharing on your DNS domain network
       Profile single process
       Profile system performance
       Recovery console: Allow automatic administrative logon
@@ -194,9 +219,10 @@ local_security_policy { 'System cryptography: Use FIPS compiant algorithms for e
       Replace a process level token
       Reset account lockout counter after
       Restore files and directories
+      Shut down the system
       Shutdown: Allow system to be shut down without having to log on
       Shutdown: Clear virtual memory pagefile
-      Shut down the system
+      Support device authentication using certificate
       Store passwords using reversible encryption
       Synchronize directory service data
       System cryptography: Force strong key protection for user keys stored on the computer
@@ -206,17 +232,30 @@ local_security_policy { 'System cryptography: Use FIPS compiant algorithms for e
       System settings: Optional subsystems
       System settings: Use Certificate Rules on Windows Executables for Software Restriction Policies
       Take ownership of files or other objects
+      Turn off handwriting recognition error reporting
+      Turn off Internet Connection Wizard if URL connection is referring to Microsoft.com
+      Turn off Microsoft Peer-to-Peer Networking Services
+      Turn off multicast name resolution
+      Turn off picture password sign-in
+      Turn off Registration if URL connection is referring to Microsoft.com
+      Turn off Search Companion content file updates
+      Turn off the "Publish to Web" task for files and folders
+      Turn off the Windows Messenger Customer Experience Improvement Program
+      Turn off Windows Customer Experience Improvement Program
+      Turn off Windows Error Reporting
+      Turn on Windows Defender protection against Potentially Unwanted Applications
+      Untrusted Font Blocking
       User Account Control: Admin Approval Mode for the Built-in Administrator account
       User Account Control: Allow UIAccess applications to prompt for elevation without using the secure desktop
       User Account Control: Behavior of the elevation prompt for administrators in Admin Approval Mode
       User Account Control: Behavior of the elevation prompt for standard users
       User Account Control: Detect application installations and prompt for elevation
-      User Account Control: Only elevate executables that are signed and validated
       User Account Control: Only elevate UIAccess applications that are installed in secure locations
+      User Account Control: Only elevate executables that are signed and validated
       User Account Control: Run all administrators in Admin Approval Mode
       User Account Control: Switch to the secure desktop when prompting for elevation
       User Account Control: Virtualize file and registry write failures to per-user locations
-
+      WDigest Authentication
 
 
 ## How this works
@@ -265,6 +304,13 @@ Currently for data_type there is only `:quoted_string`.  However, for reg_type(i
     REG_QWORD 11
     REG_QWORD_LITTLE_ENDIAN 11
 ```
+## Useful lookup tools:
+
+The following online tools have been useful in finding and adding new policy mappings:
+
+- https://getadmx.com
+- https://gpsearch.azurewebsites.net
+
 ## Commands Used
 
 ## TODO: Future release
