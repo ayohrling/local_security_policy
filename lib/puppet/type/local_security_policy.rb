@@ -28,7 +28,7 @@ Puppet::Type.newtype(:local_security_policy) do
 
   newproperty(:policy_type) do
     newvalues('System Access', 'Event Audit', 'Privilege Rights', 'Registry Values', nil, '')
-    desc 'Local Security Policy Machine Name.  What OS knows it by.'
+    desc 'Local Security Policy Type. Section of the config INF the setting is in.'
     defaultto do
       begin
         policy_hash = SecurityPolicy.find_mapping_from_policy_desc(resource[:name])
@@ -49,7 +49,6 @@ Puppet::Type.newtype(:local_security_policy) do
   end
 
   newproperty(:policy_setting) do
-
     desc 'Local Security Policy Machine Name.  What OS knows it by.'
     defaultto do
       begin
@@ -72,30 +71,56 @@ Puppet::Type.newtype(:local_security_policy) do
   newproperty(:policy_value) do
     desc 'Local Security Policy Setting Value'
     validate do |value|
-      case resource[:policy_type].to_s
-      when 'Privilege Rights'
-        if value.nil? || value.empty?
-          raise ArgumentError, "Value cannot be nil or empty.  Use \'Ensure => absent\' instead"
+      if resource[:policy_type].nil?
+        begin
+          cur_policy_hash = SecurityPolicy.find_mapping_from_policy_desc(resource[:name])
+        rescue KeyError => e
+          fail(e.message)
         end
-        # maybe validate some sort of user?
+        cur_policy_type = cur_policy_hash[:policy_type]
+      else
+        cur_policy_type = resource[:policy_type].to_s
+      end
+
+      case cur_policy_type
+      when 'Privilege Rights'
+          # maybe validate some sort of user?
       when 'Event Audit'
         raise ArgumentError, "Invalid Event type: #{value} for #{resource[:policy_value]}" unless SecurityPolicy::EVENT_TYPES.include?(value)
       when 'Registry Values'
+        cur_converted_value = SecurityPolicy.convert_registry_value(resource[:name],value)
+        cur_value_type = cur_converted_value.split(",")[0]
+        case cur_value_type
         # maybe validate the value based on the datatype?
         # REG_NONE 0
         # REG_SZ 1
+        when '1'
+          raise ArgumentError, "Invalid value for type: #{value} for REG_SZ" unless value.is_a?(String)
         # REG_EXPAND_SZ 2
         # REG_BINARY 3
         # REG_DWORD 4
+        when '4'
+          test_val = value.to_i
+          if test_val < -2147483648 || test_val > 2147483647
+            raise ArgumentError, "Invalid value for type: #{test_val} for REG_DWORD"
+          end
         # REG_DWORD_LITTLE_ENDIAN 4
         # REG_DWORD_BIG_ENDIAN 5
         # REG_LINK 6
         # REG_MULTI_SZ 7
+        when '7'
+          raise ArgumentError, "Invalid value for type: #{value} for REG_MULTI_SZ" unless value.is_a?(String)
         # REG_RESOURCE_LIST 8
         # REG_FULL_RESOURCE_DESCRIPTOR 9
         # REG_RESOURCE_REQUIREMENTS_LIST 10
         # REG_QWORD 11
+        when '11'
+          test_val = value.to_i
+          if test_val < -9223372036854775808 || test_val > 9223372036854775807
+            raise ArgumentError, "Invalid value for type: #{test_val} for REG_QWORD"
+          end
         # REG_QWORD_LITTLE_ENDIAN 11
+        end
       end
     end
 
