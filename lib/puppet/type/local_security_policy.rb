@@ -120,6 +120,8 @@ Puppet::Type.newtype(:local_security_policy) do
           end
         # REG_QWORD_LITTLE_ENDIAN 11
         end
+      when 'System Access'
+          # Multiple data types are valid.  Need to define a clever validation...
       end
     end
 
