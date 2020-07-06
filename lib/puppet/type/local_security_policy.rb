@@ -74,7 +74,7 @@ Puppet::Type.newtype(:local_security_policy) do
         begin
           cur_policy_hash = SecurityPolicy.find_mapping_from_policy_desc(resource[:name])
         rescue KeyError => e
-          fail(e.message)
+          raise(e.message)
         end
         cur_policy_type = cur_policy_hash[:policy_type]
       else
@@ -82,13 +82,13 @@ Puppet::Type.newtype(:local_security_policy) do
       end
 
       case cur_policy_type
-      when 'Privilege Rights'
-          # maybe validate some sort of user?
+      when 'Privilege Rights' # rubocop:disable Lint/EmptyWhen
+        # maybe validate some sort of user?
       when 'Event Audit'
         raise ArgumentError, "Invalid Event type: #{value} for #{resource[:policy_value]}" unless SecurityPolicy::EVENT_TYPES.include?(value)
       when 'Registry Values'
-        cur_converted_value = SecurityPolicy.convert_registry_value(resource[:name],value)
-        cur_value_type = cur_converted_value.split(",")[0]
+        cur_converted_value = SecurityPolicy.convert_registry_value(resource[:name], value)
+        cur_value_type = cur_converted_value.split(',')[0]
         case cur_value_type
         # maybe validate the value based on the datatype?
         # REG_NONE 0
@@ -100,7 +100,7 @@ Puppet::Type.newtype(:local_security_policy) do
         # REG_DWORD 4
         when '4'
           test_val = value.to_i
-          if test_val < -2147483648 || test_val > 2147483647
+          if test_val < -2_147_483_648 || test_val > 2_147_483_647
             raise ArgumentError, "Invalid value for type: #{test_val} for REG_DWORD"
           end
         # REG_DWORD_LITTLE_ENDIAN 4
@@ -115,13 +115,13 @@ Puppet::Type.newtype(:local_security_policy) do
         # REG_QWORD 11
         when '11'
           test_val = value.to_i
-          if test_val < -9223372036854775808 || test_val > 9223372036854775807
+          if test_val < -9_223_372_036_854_775_808 || test_val > 9_223_372_036_854_775_807
             raise ArgumentError, "Invalid value for type: #{test_val} for REG_QWORD"
           end
-        # REG_QWORD_LITTLE_ENDIAN 11
+          # REG_QWORD_LITTLE_ENDIAN 11
         end
-      when 'System Access'
-          # Multiple data types are valid.  Need to define a clever validation...
+      when 'System Access' # rubocop:disable Lint/EmptyWhen
+        # Multiple data types are valid.  Need to define a clever validation...
       end
     end
 
