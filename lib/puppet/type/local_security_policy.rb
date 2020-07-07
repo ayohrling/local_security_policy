@@ -74,7 +74,7 @@ Puppet::Type.newtype(:local_security_policy) do
         begin
           cur_policy_hash = SecurityPolicy.find_mapping_from_policy_desc(resource[:name])
         rescue KeyError => e
-          fail(e.message)
+          raise(e.message)
         end
         cur_policy_type = cur_policy_hash[:policy_type]
       else
