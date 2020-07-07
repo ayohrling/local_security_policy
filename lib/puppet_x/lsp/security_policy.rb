@@ -564,7 +564,7 @@ class SecurityPolicy
                 :reg_type => '4',
             },
             'Device authentication behavior using certificate' => {
-                :name => 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\Kerberos\Parameters\DevicePKInitBehavior'
+                :name => 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\Kerberos\Parameters\DevicePKInitBehavior',
                 :policy_type => 'Registry Values',
                 :reg_type => '4',
             },
@@ -638,17 +638,17 @@ class SecurityPolicy
                 :policy_type => 'Registry Values',
                 :reg_type => '4',
             },
-            'Enable Font Providers' =>
+            'Enable Font Providers' => {
                 :name => 'MACHINE\Software\Policies\Microsoft\Windows\System\EnableFontProviders',
                 :policy_type => 'Registry Values',
                 :reg_type => '4',
             },
-            'Enable insecure guest logons' =>
+            'Enable insecure guest logons' => {
                 :name => 'MACHINE\Software\Policies\Microsoft\Windows\LanmanWorkstation\AllowInsecureGuestAuth',
                 :policy_type => 'Registry Values',
                 :reg_type => '4',
             },
-            'Enable Local Admin Password Management' => 
+            'Enable Local Admin Password Management' => {
                 :name => 'MACHINE\Software\Policies\Microsoft Services\AdmPwd\AdmPwdEnabled',
                 :policy_type => 'Registry Values',
                 :reg_type => '4',
