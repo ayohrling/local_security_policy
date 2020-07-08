@@ -29,7 +29,7 @@ Puppet::Type.type(:local_security_policy).provide(:policy) do
   # limit access to windows hosts only
   confine operatingsystem: :windows
   # limit access to systems with these commands since this is the tools we need
-  commands wmic: 'wmic', secedit: 'secedit'
+  commands secedit: 'secedit'
 
   mk_resource_methods
 
@@ -63,6 +63,11 @@ Puppet::Type.type(:local_security_policy).provide(:policy) do
     case type
     when :quoted_string
       value = "\"#{value}\""
+    when :principal
+      sids = Array.[]
+      value.split(',').sort.each do |suser|
+        sids << ((suser !~ %r{^(\*S-1-.+)$}) ? ('*' + Puppet::Util::Windows::SID.name_to_sid(suser).to_s) : suser.to_s)
+      end
     end
     value
   end

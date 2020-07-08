@@ -5,14 +5,13 @@ require 'awesome_print'
 
 provider_class = Puppet::Type.type(:local_security_policy).provider(:policy)
 
-# rubocop:disable RSpec/SubjectStub,RSpec/NamedSubject,RSpec/AnyInstance
+# rubocop:disable RSpec/SubjectStub,RSpec/NamedSubject
 describe provider_class do
   include PuppetlabsSpec::Fixtures
 
   subject { provider_class }
 
   before(:each) do
-    allow(Puppet::Util).to receive(:which).with('wmic').and_return('c:\\tools\\wmic')
     allow(Puppet::Util).to receive(:which).with('secedit').and_return('c:\\tools\\secedit')
 
     infout = StringIO.new
@@ -27,8 +26,6 @@ describe provider_class do
     allow(subject).to receive(:temp_file).and_return(secdata)
     allow(subject).to receive(:secedit).with(['/configure', '/db', 'sdbout', '/cfg', 'infout', '/quiet']).and_return(true)
     allow(subject).to receive(:secedit).with(['/export', '/cfg', secdata, '/quiet']).and_return(true)
-    allow_any_instance_of(SecurityPolicy).to receive(:wmic).with(['useraccount', 'get', 'name,sid', '/format:csv']).and_return(userdata)
-    allow_any_instance_of(SecurityPolicy).to receive(:wmic).with(['group', 'get', 'name,sid', '/format:csv']).and_return(groupdata)
   end
 
   let(:facts) { os_facts }
@@ -44,16 +41,6 @@ describe provider_class do
   # mock up the data which was gathered on a real windows system
   let(:secdata) do
     my_fixture(File.join('..', 'secedit.inf'))
-  end
-
-  let(:groupdata) do
-    file = my_fixture(File.join('..', 'group.txt'))
-    File.open(file, 'r') { |f| f.read.encode('utf-8', universal_newline: true).delete("\xEF\xBB\xBF") }
-  end
-
-  let(:userdata) do
-    file = my_fixture(File.join('..', 'useraccount.txt'))
-    File.open(file, 'r') { |f| f.read.encode('utf-8', universal_newline: true).delete("\xEF\xBB\xBF") }
   end
 
   let(:resource) do

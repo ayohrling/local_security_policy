@@ -3,15 +3,13 @@
 require 'spec_helper'
 require 'puppet_x/lsp/security_policy'
 
-# rubocop:disable RSpec/SubjectStub,RSpec/NamedSubject,RSpec/AnyInstance
+# rubocop:disable RSpec/SubjectStub,RSpec/NamedSubject
 describe 'SecurityPolicy' do
   include PuppetlabsSpec::Fixtures
 
   subject { SecurityPolicy }
 
   before(:each) do
-    ENV['COMPUTERNAME'] = 'testsystem'
-    allow(Puppet::Util).to receive(:which).with('wmic').and_return('c:\\tools\\wmic')
     allow(Puppet::Util).to receive(:which).with('secedit').and_return('c:\\tools\\secedit')
 
     infout = StringIO.new
@@ -22,13 +20,13 @@ describe 'SecurityPolicy' do
     # the below mock seems to be required or rspec complains
     allow(File).to receive(:file?).with(%r{facter|lsb_release}).and_return(true)
     allow(subject).to receive(:temp_file).and_return(secdata)
-    allow(security_policy).to receive(:wmic).with(['useraccount', 'get', 'name,sid', '/format:csv']).and_return(userdata)
-    allow(security_policy).to receive(:wmic).with(['group', 'get', 'name,sid', '/format:csv']).and_return(groupdata)
-    allow_any_instance_of(SecurityPolicy).to receive(:wmic).with(['useraccount', 'where', '(domain="testsystem")', 'get', 'name,sid', '/format:csv']).and_return(userdata)
-    allow_any_instance_of(SecurityPolicy).to receive(:wmic).with(['group', 'where', '(domain="testsystem")', 'get', 'name,sid', '/format:csv']).and_return(groupdata)
-
     allow(subject).to receive(:secedit).with(['/configure', '/db', 'sdbout', '/cfg', 'infout', '/quiet']).and_return(true)
     allow(subject).to receive(:secedit).with(['/export', '/cfg', secdata, '/quiet']).and_return(true)
+    allow(Puppet::Util::Windows::SID).to receive(:name_to_sid).with('Network Configuration Operators').and_return('S-1-5-32-556')
+    allow(Puppet::Util::Windows::SID).to receive(:name_to_sid).with('NT_SERVICE\\ALL_SERVICES').and_return('S-1-5-80-0')
+    allow(Puppet::Util::Windows::SID).to receive(:name_to_sid).with('NT AUTHORITY\\Authenticated Users').and_return('S-1-5-11')
+    allow(Puppet::Util::Windows::SID).to receive(:name_to_sid).with('Administrators').and_return('S-1-5-32-544')
+    allow(Puppet::Util::Windows::SID).to receive(:name_to_sid).with('N_SERVICE\\ALL_SERVICES').and_return(nil)
   end
 
   let(:secdata) do
@@ -49,27 +47,8 @@ describe 'SecurityPolicy' do
     SecurityPolicy.new
   end
 
-  it 'returns builtin accounts' do
-    # we just want to check that this is an array within an array that has 3 elements in each element
-    expect(security_policy.builtin_accounts.count).to be > 50
-    expect(security_policy.builtin_accounts.first.count).to eq(3)
-  end
-
-  it 'user_sid_array should return array' do
-    a = security_policy.user_sid_array
-    # we just want to check that this is an array within an array that has 3 elements in each element
-    expect(a.count).to be > 50
-    expect(a.first.count).to eq(3)
-  end
-
-  it 'local accounts should return array' do
-    a = security_policy.local_accounts
-    expect(a).to be_instance_of(Array)
-    expect(a.count).to eq(19)
-    expect(a.first.count).to eq(3)
-  end
-
-  it 'returns user' do
+  # sid_to_user function is not used anywhere, no need to test...
+  xit 'returns user' do
     expect(security_policy.sid_to_user('S-1-5-32-556')).to eq('Network Configuration Operators')
     expect(security_policy.sid_to_user('*S-1-5-80-0')).to eq('NT_SERVICE\\ALL_SERVICES')
   end
@@ -83,8 +62,8 @@ describe 'SecurityPolicy' do
     expect(security_policy.user_to_sid('NT_SERVICE\\ALL_SERVICES')).to eq('*S-1-5-80-0')
   end
 
-  it 'returns user when sid is not found' do
-    expect(security_policy.user_to_sid('N_SERVICE\\ALL_SERVICES')).to eq('N_SERVICE\\ALL_SERVICES')
+  it 'returns nil when sid is not found' do
+    expect(security_policy.user_to_sid('N_SERVICE\\ALL_SERVICES')).to eq(nil)
   end
 
   describe 'registry value' do
@@ -123,7 +102,7 @@ describe 'SecurityPolicy' do
         ensure: 'present',
         policy_setting: 'SeNetworkLogonRight',
         policy_type: 'Privilege Rights',
-        policy_value: 'AUTHENTICATED_USERS,BUILTIN_ADMINISTRATORS',
+        policy_value: 'NT AUTHORITY\\Authenticated Users,Administrators',
       )
     end
 
