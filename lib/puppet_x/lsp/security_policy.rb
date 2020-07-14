@@ -2,6 +2,7 @@
 
 require 'puppet/provider'
 require 'puppet/util'
+require 'puppet/util/windows'
 
 # class SecurityPolicy
 class SecurityPolicy
