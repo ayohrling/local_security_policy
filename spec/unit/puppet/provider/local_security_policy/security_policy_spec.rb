@@ -2,6 +2,7 @@
 
 require 'spec_helper'
 require 'puppet_x/lsp/security_policy'
+require 'puppet/util'
 
 # rubocop:disable RSpec/SubjectStub,RSpec/NamedSubject
 describe 'SecurityPolicy' do

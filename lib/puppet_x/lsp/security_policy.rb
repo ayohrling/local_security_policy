@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'puppet/provider'
+require 'puppet/util'
 
 # class SecurityPolicy
 class SecurityPolicy
