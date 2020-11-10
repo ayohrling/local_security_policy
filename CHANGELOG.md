@@ -1,3 +1,7 @@
+## [0.8.0] - 2020-11-10
+### Added
+- Newly introduced settings for Windows 2016 and 2019
+
 ## [0.7.2] - 2020-09-11
 ### Added
 - Support for local or domain group lookup
