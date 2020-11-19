@@ -425,8 +425,7 @@ module PuppetX # rubocop:disable Style/ClassAndModuleChildren
         @hash = hash
         @default = default
 
-        comment = comment.to_s.empty? ? '\\z' : "\\s*(?:[#{comment}].*)?\\z"
-
+        comment = comment.to_s.empty? ? '\\z' : "\\s*(?:(?<=(?:\\A|\\s))[#{comment}].*)?\\z"
         @section_regexp  = %r{\A\s*\[([^\]]+)\]#{comment}}
         @ignore_regexp   = %r{\A#{comment}}
         @property_regexp = %r{\A(.*?)(?<!\\)#{param}(.*)\z}
