@@ -13,10 +13,9 @@ describe 'local_security_policy' do
   context 'enable registry value policy' do
     let(:manifest) do
       <<~END
-      local_security_policy {
-        'Network access: Restrict clients allowed to make remote calls to SAM':
-          ensure => present,
-          policy_value => '1,"O:BAG:BAD:(A;;RC;;;BA)"',
+      local_security_policy { 'Network access: Restrict clients allowed to make remote calls to SAM':
+        ensure => present,
+        policy_value => '1,"O:BAG:BAD:(A;;RC;;;BA)"',
       }
       END
     end
@@ -30,7 +29,7 @@ describe 'local_security_policy' do
     it 'sets the value correctly' do
       hosts.each do |host|
         value = get_reg_key_on(host, 'HKLM:\System\CurrentControlSet\Control\Lsa')
-        expect(value['RestrictRemoteSAM']).to eq('O:BAG:BAD:(A;;RC;;;BA)')
+        expect(value['restrictremotesam']).to eq('O:BAG:BAD:(A;;RC;;;BA)')
       end
     end
   end
@@ -38,10 +37,9 @@ describe 'local_security_policy' do
   context 'disable registry value policy' do
     let(:manifest) do
       <<~END
-      local_security_policy {
-        'Network access: Restrict clients allowed to make remote calls to SAM':
-          ensure => present,
-          policy_value => '',
+      local_security_policy { 'Network access: Restrict clients allowed to make remote calls to SAM':
+        ensure => present,
+        policy_value => '',
       }
       END
     end
@@ -55,7 +53,7 @@ describe 'local_security_policy' do
     it 'sets the value correctly' do
       hosts.each do |host|
         value = get_reg_key_on(host, 'HKLM:\System\CurrentControlSet\Control\Lsa')
-        expect(value['RestrictRemoteSAM']).to eq('')
+        expect(value['restrictremotesam']).to eq('')
       end
     end
   end
