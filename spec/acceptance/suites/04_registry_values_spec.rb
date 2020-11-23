@@ -30,7 +30,7 @@ describe 'local_security_policy' do
     it 'sets the value correctly' do
       hosts.each do |host|
         value = get_reg_key_on(host, 'HKLM:\System\CurrentControlSet\Control\Lsa')
-        expect(value['RestrictRemoteSAM']).to eq("O:BAG:BAD:(A;;RC;;;BA)")
+        expect(value['RestrictRemoteSAM']).to eq('O:BAG:BAD:(A;;RC;;;BA)')
       end
     end
   end
