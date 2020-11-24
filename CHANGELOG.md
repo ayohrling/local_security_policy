@@ -1,3 +1,7 @@
+## [0.8.1] - 2020-11-24
+### Changed
+- Fixed 'SDDL values are not idempotent' - #108
+
 ## [0.8.0] - 2020-11-10
 ### Added
 - Newly introduced settings for Windows 2016 and 2019
