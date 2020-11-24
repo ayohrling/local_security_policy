@@ -13,10 +13,10 @@ describe 'local_security_policy' do
   context 'enable registry value policy' do
     let(:manifest) do
       <<~END
-        local_security_policy { 'System objects: Strengthen default permissions of internal system objects (e.g., Symbolic Links)':
-          ensure       => present,
-          policy_value => '4,1',
-        }
+      local_security_policy { 'Network access: Restrict clients allowed to make remote calls to SAM':
+        ensure => present,
+        policy_value => '1,"O:BAG:BAD:(A;;RC;;;BA)"',
+      }
       END
     end
 
@@ -28,9 +28,8 @@ describe 'local_security_policy' do
 
     it 'sets the value correctly' do
       hosts.each do |host|
-        # value = get_registry_value_on(host, :hklm, 'SYSTEM\CurrentControlSet\Control\Session Manager', 'ProtectionMode')
-        value = get_reg_key_on(host, 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager')
-        expect(value['ProtectionMode']).to eq(1)
+        value = get_reg_key_on(host, 'HKLM:\System\CurrentControlSet\Control\Lsa')
+        expect(value['restrictremotesam']).to eq('O:BAG:BAD:(A;;RC;;;BA)')
       end
     end
   end
@@ -38,10 +37,10 @@ describe 'local_security_policy' do
   context 'disable registry value policy' do
     let(:manifest) do
       <<~END
-        local_security_policy { 'System objects: Strengthen default permissions of internal system objects (e.g., Symbolic Links)':
-          ensure       => present,
-          policy_value => '4,0',
-        }
+      local_security_policy { 'Network access: Restrict clients allowed to make remote calls to SAM':
+        ensure => present,
+        policy_value => '',
+      }
       END
     end
 
@@ -53,9 +52,8 @@ describe 'local_security_policy' do
 
     it 'sets the value correctly' do
       hosts.each do |host|
-        # value = get_registry_value_on(host, :hklm, 'SYSTEM\CurrentControlSet\Control\Session Manager', 'ProtectionMode')
-        value = get_reg_key_on(host, 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager')
-        expect(value['ProtectionMode']).to eq(0)
+        value = get_reg_key_on(host, 'HKLM:\System\CurrentControlSet\Control\Lsa')
+        expect(value['restrictremotesam']).to eq('')
       end
     end
   end
