@@ -68,6 +68,7 @@ Puppet::Type.type(:local_security_policy).provide(:policy) do
       value.split(',').sort.each do |suser|
         sids << ((suser !~ %r{^(\*S-1-.+)$}) ? ('*' + Puppet::Util::Windows::SID.name_to_sid(suser).to_s) : suser.to_s)
       end
+      value = sids.join(',')
     end
     value
   end
