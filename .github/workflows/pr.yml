@@ -1,0 +1,50 @@
+---
+name: 'PR tests'
+on:
+  - pull_request
+
+jobs:
+
+  syntax:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        puppet:
+          - label: 'Puppet 6'
+            puppet_version: '~> 6'
+            ruby_version: '2.5'
+          - label: 'Puppet 7'
+            puppet_version: '~> 7'
+            ruby_version: '2.7'
+    env:
+      PUPPET_GEM_VERSION: ${{matrix.puppet.puppet_version}}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{matrix.puppet.ruby_version}}
+          bundler-cache: true
+      - run: bundle exec rake syntax lint metadata_lint check:symlinks check:git_ignore check:dot_underscore check:test_file rubocop
+
+  parallel_spec:
+    needs:
+      - syntax
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        puppet:
+          - label: 'Puppet 6'
+            puppet_version: '~> 6'
+            ruby_version: '2.5'
+          - label: 'Puppet 7'
+            puppet_version: '~> 7'
+            ruby_version: '2.7'
+    env:
+      PUPPET_GEM_VERSION: ${{matrix.puppet.puppet_version}}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{matrix.puppet.ruby_version}}
+          bundler-cache: true
+      - run: bundle exec rake parallel_spec
