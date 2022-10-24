@@ -440,7 +440,7 @@ module PuppetX # rubocop:disable Style/ClassAndModuleChildren
       # Returns `true` if the current value starts with a leading double quote.
       # Otherwise returns false.
       def leading_quote?
-        value && value.start_with?('"')
+        value&.start_with?('"')
       end
 
       # Given a string, attempt to parse out a value from that string. This

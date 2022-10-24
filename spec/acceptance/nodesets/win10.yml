@@ -22,4 +22,4 @@ HOSTS:
 CONFIG:
   log_level: verbose
   type: aio
-  puppet_collection: <%= ENV['BEAKER_PUPPET_COLLECTION'] || 'puppet5' %>
+  puppet_collection: <%= ENV['BEAKER_PUPPET_COLLECTION'] || 'puppet7' %>

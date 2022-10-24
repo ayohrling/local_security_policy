@@ -3,7 +3,7 @@
 require 'spec_helper_acceptance'
 
 describe 'local_security_policy' do
-  ['*S-1-5-32-544,*S-1-5-9', '*S-1-5-11,*S-1-5-32-544,*S-1-5-9'].each do |policy_value|
+  ['lsp_admin,*S-1-5-32-544,*S-1-5-9', '*S-1-5-11,*S-1-5-32-544,*S-1-5-9'].each do |policy_value|
     context "set privilege rights policy (SeNetworkLogonRight = '#{policy_value}')" do
       let(:manifest) do
         <<~END

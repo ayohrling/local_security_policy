@@ -12,14 +12,16 @@ HOSTS:
       - default
       - windows
     platform: windows-server-amd64
-    box: opentable/win-2012r2-standard-amd64-nocm
+    box: devopsgroup-io/windows_server-2012r2-standard-amd64-nocm
     hypervisor: <%= hypervisor %>
     vagrant_memsize: 2048
     vagrant_cpus: 2
     user: vagrant
     is_cygwin: false
+    ssh:
+      append_all_supported_algorithms: true
 
 CONFIG:
   log_level: verbose
   type: aio
-  puppet_collection: <%= ENV['BEAKER_PUPPET_COLLECTION'] || 'puppet5' %>
+  puppet_collection: <%= ENV['BEAKER_PUPPET_COLLECTION'] || 'puppet7' %>

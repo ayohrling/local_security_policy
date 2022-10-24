@@ -28,8 +28,12 @@ Gemfile:
       - gem: beaker-module_install_helper
       - gem: beaker-vagrant
       - gem: vagrant-wrapper
-      - gem: net-ssh
-        version: '~> 5.2'
+      - gem: 'net-ssh'
+        version: '>= 6'
+      - gem: 'ed25519'
+      - gem: 'x25519'
+        version: '1.0.8'
+      - gem: 'bcrypt_pbkdf'
 .rubocop.yml:
   profiles:
     strict:
@@ -56,7 +60,7 @@ Gemfile:
       2.5.7:
         tags:
           - docker
-      2.4.5:
+      2.7.2:
         tags:
           - docker
     # Due to bugs in the PDK template, the following:
@@ -79,3 +83,11 @@ Gemfile:
           - bundle exec rake beaker
         tags:
           - beaker
+.travis.yml:
+  ruby_versions:
+    - 2.5.7
+    - 2.7.2
+  includes:
+    - env: PUPPET_GEM_VERSION="~> 7.0" CHECK=parallel_spec
+      rvm: 2.7.2
+      stage: spec

@@ -82,7 +82,7 @@ Puppet::Type.newtype(:local_security_policy) do
       end
 
       case cur_policy_type
-      when 'Privilege Rights' # rubocop:disable Lint/EmptyWhen
+      when 'Privilege Rights'
         # maybe validate some sort of user?
       when 'Event Audit'
         raise ArgumentError, "Invalid Event type: #{value} for #{resource[:policy_value]}" unless SecurityPolicy::EVENT_TYPES.include?(value)
@@ -120,7 +120,7 @@ Puppet::Type.newtype(:local_security_policy) do
           end
           # REG_QWORD_LITTLE_ENDIAN 11
         end
-      when 'System Access' # rubocop:disable Lint/EmptyWhen
+      when 'System Access'
         # Multiple data types are valid.  Need to define a clever validation...
       end
     end
@@ -128,7 +128,7 @@ Puppet::Type.newtype(:local_security_policy) do
     munge do |value|
       # need to convert policy values to designated types
       case resource[:policy_type].to_s
-      when 'Registry Values' # rubocop:disable Lint/EmptyWhen
+      when 'Registry Values'
         # secedit values sometimes look like : "1,\"4\""
       end
       SecurityPolicy.convert_policy_value(resource.to_hash, value)
