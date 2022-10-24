@@ -171,14 +171,25 @@ class SecurityPolicy
         name: 'MinimumPasswordLength',
         policy_type: 'System Access',
       },
+      'Minimum password length audit' => {
+        name: 'MACHINE\System\CurrentControlSet\Control\SAM\MinimumPasswordLengthAudit',
+        reg_type: '4',
+        policy_type: 'Registry Values',
+      },
       'Password must meet complexity requirements' => {
         name: 'PasswordComplexity',
         policy_type: 'System Access',
+      },
+      'Relax minimum password length limits' => {
+        name: 'MACHINE\System\CurrentControlSet\Control\SAM\RelaxMinimumPasswordLengthLimits',
+        reg_type: '4',
+        policy_type: 'Registry Values',
       },
       'Store passwords using reversible encryption' => {
         name: 'ClearTextPassword',
         policy_type: 'System Access',
       },
+      # Account Lockout Policy mappings
       'Account lockout threshold' => {
         name: 'LockoutBadCount',
         policy_type: 'System Access',
@@ -189,40 +200,6 @@ class SecurityPolicy
       },
       'Reset account lockout counter after' => {
         name: 'ResetLockoutCount',
-        policy_type: 'System Access',
-      },
-      'Accounts: Rename administrator account' => {
-        name: 'NewAdministratorName',
-        policy_type: 'System Access',
-        data_type: :quoted_string,
-      },
-      'Accounts: Administrator account status' => {
-        name: 'EnableAdminAccount',
-        policy_type: 'System Access',
-      },
-      'Accounts: Rename guest account' => {
-        name: 'NewGuestName',
-        policy_type: 'System Access',
-        data_type: :quoted_string,
-      },
-      'Accounts: Require Login to Change Password' => {
-        name: 'RequireLogonToChangePassword',
-        policy_type: 'System Access',
-      },
-      'Network security: Force logoff when logon hours expire' => {
-        name: 'ForceLogoffWhenHourExpire',
-        policy_type: 'System Access',
-      },
-      'Network access: Allow anonymous SID/name translation' => {
-        name: 'LSAAnonymousNameLookup',
-        policy_type: 'System Access',
-      },
-      'EnableAdminAccount' => {
-        name: 'EnableAdminAccount',
-        policy_type: 'System Access',
-      },
-      'EnableGuestAccount' => {
-        name: 'EnableGuestAccount',
         policy_type: 'System Access',
       },
       # Audit Policy Mappings
@@ -262,12 +239,7 @@ class SecurityPolicy
         name: 'AuditSystemEvents',
         policy_type: 'Event Audit',
       },
-      'Audit: Force audit policy subcategory settings (Windows Vista or later) to override audit policy category settings' => {
-        name: 'MACHINE\System\CurrentControlSet\Control\Lsa\SCENoApplyLegacyAuditPolicy',
-        reg_type: '4',
-        policy_type: 'Registry Values',
-      },
-      # User rights mapping
+      # User Rights Assignment mappings
       'Access Credential Manager as a trusted caller' => {
         name: 'SeTrustedCredManAccessPrivilege',
         policy_type: 'Privilege Rights',
@@ -443,6 +415,11 @@ class SecurityPolicy
         policy_type: 'Privilege Rights',
         data_type: :principal,
       },
+      'Obtain an impersonation token for another user in the same session' => {
+        name: 'SeDelegateSessionUserImpersonatePrivilege',
+        policy_type: 'Privilege Rights',
+        data_type: :principal,
+      },
       'Perform volume maintenance tasks' => {
         name: 'SeManageVolumePrivilege',
         policy_type: 'Privilege Rights',
@@ -488,159 +465,49 @@ class SecurityPolicy
         policy_type: 'Privilege Rights',
         data_type: :principal,
       },
-      # Registry Keys
-      'Recovery console: Allow automatic administrative logon' => {
-        name: 'MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Setup\RecoveryConsole\SecurityLevel',
+      # Security Options mappings
+      'Accounts: Administrator account status' => {
+        name: 'EnableAdminAccount',
+        policy_type: 'System Access',
+      },
+      'EnableAdminAccount' => {
+        name: 'EnableAdminAccount',
+        policy_type: 'System Access',
+      },
+      'Accounts: Block Microsoft accounts' => {
+        name: 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\NoConnectedUser',
         reg_type: '4',
         policy_type: 'Registry Values',
       },
-      'Recovery console: Allow floppy copy and access to all drives and all folders' => {
-        name: 'MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Setup\RecoveryConsole\SetCommand',
+      'Accounts: Guest account status' => {
+        name: 'EnableGuestAccount',
+        policy_type: 'System Access',
+      },
+      'EnableGuestAccount' => {
+        name: 'EnableGuestAccount',
+        policy_type: 'System Access',
+      },
+      'Accounts: Limit local account use of blank passwords to console logon only' => {
+        name: 'MACHINE\System\CurrentControlSet\Control\Lsa\LimitBlankPasswordUse',
         reg_type: '4',
         policy_type: 'Registry Values',
       },
-      'Interactive logon: Number of previous logons to cache (in case domain controller is not available)' => {
-        name: 'MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Winlogon\CachedLogonsCount',
-        reg_type: '1',
-        policy_type: 'Registry Values',
+      'Accounts: Rename administrator account' => {
+        name: 'NewAdministratorName',
+        policy_type: 'System Access',
+        data_type: :quoted_string,
       },
-      'Interactive logon: Require Domain Controller authentication to unlock workstation' => {
-        name: 'MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Winlogon\ForceUnlockLogon',
-        reg_type: '4',
-        policy_type: 'Registry Values',
+      'Accounts: Rename guest account' => {
+        name: 'NewGuestName',
+        policy_type: 'System Access',
+        data_type: :quoted_string,
       },
-      'Interactive logon: Prompt user to change password before expiration' => {
-        name: 'MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Winlogon\PasswordExpiryWarning',
-        reg_type: '4',
-        policy_type: 'Registry Values',
-      },
-      'Interactive logon: Smart card removal behavior' => {
-        name: 'MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Winlogon\ScRemoveOption',
-        reg_type: '1',
-        policy_type: 'Registry Values',
-      },
-      'User Account Control: Behavior of the elevation prompt for administrators in Admin Approval Mode' => {
-        name: 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\ConsentPromptBehaviorAdmin',
-        reg_type: '4',
-        policy_type: 'Registry Values',
-      },
-      'User Account Control: Behavior of the elevation prompt for standard users' => {
-        name: 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\ConsentPromptBehaviorUser',
-        reg_type: '4',
-        policy_type: 'Registry Values',
-      },
-      'Interactive logon: Do not require CTRL+ALT+DEL' => {
-        name: 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\DisableCAD',
-        reg_type: '4',
-        policy_type: 'Registry Values',
-      },
-      'Interactive logon: Do not display last user name' => {
-        name: 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\DontDisplayLastUserName',
-        reg_type: '4',
-        policy_type: 'Registry Values',
-      },
-      'User Account Control: Detect application installations and prompt for elevation' => {
-        name: 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\EnableInstallerDetection',
-        reg_type: '4',
-        policy_type: 'Registry Values',
-      },
-      'User Account Control: Run all administrators in Admin Approval Mode' => {
-        name: 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\EnableLUA',
-        reg_type: '4',
-        policy_type: 'Registry Values',
-      },
-      'User Account Control: Only elevate UIAccess applications that are installed in secure locations' => {
-        name: 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\EnableSecureUIAPaths',
-        reg_type: '4',
-        policy_type: 'Registry Values',
-      },
-      'User Account Control: Allow UIAccess applications to prompt for elevation without using the secure desktop' => {
-        name: 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\EnableUIADesktopToggle',
-        reg_type: '4',
-        policy_type: 'Registry Values',
-      },
-      'User Account Control: Virtualize file and registry write failures to per-user locations' => {
-        name: 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\EnableVirtualization',
-        reg_type: '4',
-        policy_type: 'Registry Values',
-      },
-      'User Account Control: Admin Approval Mode for the Built-in Administrator account' => {
-        name: 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\FilterAdministratorToken',
-        reg_type: '4',
-        policy_type: 'Registry Values',
-      },
-      'Interactive logon: Message title for users attempting to log on' => {
-        name: 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\LegalNoticeCaption',
-        reg_type: '1',
-        policy_type: 'Registry Values',
-      },
-      'Interactive logon: Message text for users attempting to log on' => {
-        name: 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\LegalNoticeText',
-        reg_type: '7',
-        policy_type: 'Registry Values',
-      },
-      'User Account Control: Switch to the secure desktop when prompting for elevation' => {
-        name: 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\PromptOnSecureDesktop',
-        reg_type: '4',
-        policy_type: 'Registry Values',
-      },
-      'Interactive logon: Require smart card' => {
-        name: 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\ScForceOption',
-        reg_type: '4',
-        policy_type: 'Registry Values',
-      },
-      'Shutdown: Allow system to be shut down without having to log on' => {
-        name: 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\ShutdownWithoutLogon',
-        reg_type: '4',
-        policy_type: 'Registry Values',
-      },
-      'Devices: Allow undock without having to log on' => {
-        name: 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\UndockWithoutLogon',
-        reg_type: '4',
-        policy_type: 'Registry Values',
-      },
-      'User Account Control: Only elevate executables that are signed and validated' => {
-        name: 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\ValidateAdminCodeSignatures',
-        reg_type: '4',
-        policy_type: 'Registry Values',
-      },
-      'System settings: Use Certificate Rules on Windows Executables for Software Restriction Policies' => {
-        name: 'MACHINE\Software\Policies\Microsoft\Windows\Safer\CodeIdentifiers\AuthenticodeEnabled',
-        reg_type: '4',
-        policy_type: 'Registry Values',
+      'Accounts: Require Login to Change Password' => {
+        name: 'RequireLogonToChangePassword',
+        policy_type: 'System Access',
       },
       'Audit: Audit the access of global system objects' => {
         name: 'MACHINE\System\CurrentControlSet\Control\Lsa\AuditBaseObjects',
-        reg_type: '4',
-        policy_type: 'Registry Values',
-      },
-      'Audit: Shut down system immediately if unable to log security audits' => {
-        name: 'MACHINE\System\CurrentControlSet\Control\Lsa\CrashOnAuditFail',
-        reg_type: '4',
-        policy_type: 'Registry Values',
-      },
-      'Network access: Do not allow storage of passwords and credentials for network authentication' => {
-        name: 'MACHINE\System\CurrentControlSet\Control\Lsa\DisableDomainCreds',
-        reg_type: '4',
-        policy_type: 'Registry Values',
-      },
-      'Network access: Let Everyone permissions apply to anonymous users' => {
-        name: 'MACHINE\System\CurrentControlSet\Control\Lsa\EveryoneIncludesAnonymous',
-        reg_type: '4',
-        policy_type: 'Registry Values',
-      },
-      'Network access: Sharing and security model for local accounts' => {
-        name: 'MACHINE\System\CurrentControlSet\Control\Lsa\ForceGuest',
-        reg_type: '4',
-        policy_type: 'Registry Values',
-      },
-      'System cryptography: Use FIPS compliant algorithms for encryption, hashing, and signing' => {
-        name: 'MACHINE\System\CurrentControlSet\Control\Lsa\FIPSAlgorithmPolicy\Enabled',
-        reg_type: '4',
-        policy_type: 'Registry Values',
-      },
-      'System cryptography: Force strong key protection for user keys stored on the computer' => {
-        name: 'MACHINE\Software\Policies\Microsoft\Cryptography\ForceKeyProtection',
         reg_type: '4',
         policy_type: 'Registry Values',
       },
@@ -649,34 +516,29 @@ class SecurityPolicy
         reg_type: '3',
         policy_type: 'Registry Values',
       },
-      'Accounts: Block Microsoft accounts' => {
-        name: 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\NoConnectedUser',
+      'Audit: Force audit policy subcategory settings (Windows Vista or later) to override audit policy category settings' => {
+        name: 'MACHINE\System\CurrentControlSet\Control\Lsa\SCENoApplyLegacyAuditPolicy',
         reg_type: '4',
         policy_type: 'Registry Values',
       },
-      'Accounts: Limit local account use of blank passwords to console logon only' => {
-        name: 'MACHINE\System\CurrentControlSet\Control\Lsa\LimitBlankPasswordUse',
+      'Audit: Shut down system immediately if unable to log security audits' => {
+        name: 'MACHINE\System\CurrentControlSet\Control\Lsa\CrashOnAuditFail',
         reg_type: '4',
         policy_type: 'Registry Values',
       },
-      'Network security: All Local System to use computer identity for NTLM' => {
-        name: 'MACHINE\System\CurrentControlSet\Control\Lsa\UseMachineId',
-        reg_type: '4',
+      'DCOM: Machine Access Restrictions in Security Descriptor Definition Language (SDDL) syntax' => {
+        name: 'MACHINE\Software\Policies\Microsoft\Windows NT\DCOM\MachineAccessRestriction',
         policy_type: 'Registry Values',
-      },
-      'Network access: Remotely accessible registry paths' => {
-        name: 'MACHINE\System\CurrentControlSet\Control\SecurePipeServers\Winreg\AllowedExactPaths\Machine',
-        reg_type: '7',
-        policy_type: 'Registry Values',
-      },
-      'Devices: Restrict CD-ROM access to locally logged-on user only' => {
-        name: 'MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Winlogon\AllocateCDRoms',
         reg_type: '1',
-        policy_type: 'Registry Values',
       },
-      'Devices: Restrict floppy access to locally logged-on user only' => {
-        name: 'MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Winlogon\AllocateFloppies',
+      'DCOM: Machine Launch Restrictions in Security Descriptor Definition Language (SDDL) syntax' => {
+        name: 'MACHINE\Software\Policies\Microsoft\Windows NT\DCOM\MachineLaunchRestriction',
+        policy_type: 'Registry Values',
         reg_type: '1',
+      },
+      'Devices: Allow undock without having to log on' => {
+        name: 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\UndockWithoutLogon',
+        reg_type: '4',
         policy_type: 'Registry Values',
       },
       'Devices: Allowed to format and eject removable media' => {
@@ -687,6 +549,16 @@ class SecurityPolicy
       'Devices: Prevent users from installing printer drivers' => {
         name: 'MACHINE\System\CurrentControlSet\Control\Print\Providers\LanMan Print Services\Servers\AddPrinterDrivers',
         reg_type: '4',
+        policy_type: 'Registry Values',
+      },
+      'Devices: Restrict CD-ROM access to locally logged-on user only' => {
+        name: 'MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Winlogon\AllocateCDRoms',
+        reg_type: '1',
+        policy_type: 'Registry Values',
+      },
+      'Devices: Restrict floppy access to locally logged-on user only' => {
+        name: 'MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Winlogon\AllocateFloppies',
+        reg_type: '1',
         policy_type: 'Registry Values',
       },
       'Domain member: Digitally encrypt or sign secure channel data (always)' => {
@@ -724,14 +596,74 @@ class SecurityPolicy
         reg_type: '4',
         policy_type: 'Registry Values',
       },
-      'Interactive logon: Machine inactivity limit' => {
-        name: 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\InactivityTimeoutSecs',
+      'Interactive logon: Do not display last user name' => {
+        name: 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\DontDisplayLastUserName',
+        reg_type: '4',
+        policy_type: 'Registry Values',
+      },
+      'Interactive logon: Do not require CTRL+ALT+DEL' => {
+        name: 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\DisableCAD',
+        reg_type: '4',
+        policy_type: 'Registry Values',
+      },
+      "Interactive logon: Don't display last signed-in" => {
+        name: 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\DontDisplayLastUserName',
+        reg_type: '4',
+        policy_type: 'Registry Values',
+      },
+      "Interactive logon: Don't display username at sign-in" => {
+        name: 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\DontDisplayUserName',
         reg_type: '4',
         policy_type: 'Registry Values',
       },
       'Interactive logon: Machine account lockout threshold' => {
         name: 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\MaxDevicePasswordFailedAttempts',
         reg_type: '4',
+        policy_type: 'Registry Values',
+      },
+      'Interactive logon: Machine inactivity limit' => {
+        name: 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\InactivityTimeoutSecs',
+        reg_type: '4',
+        policy_type: 'Registry Values',
+      },
+      'Interactive logon: Message text for users attempting to log on' => {
+        name: 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\LegalNoticeText',
+        reg_type: '7',
+        policy_type: 'Registry Values',
+      },
+      'Interactive logon: Message title for users attempting to log on' => {
+        name: 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\LegalNoticeCaption',
+        reg_type: '1',
+        policy_type: 'Registry Values',
+      },
+      'Interactive logon: Number of previous logons to cache (in case domain controller is not available)' => {
+        name: 'MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Winlogon\CachedLogonsCount',
+        reg_type: '1',
+        policy_type: 'Registry Values',
+      },
+      'Interactive logon: Prompt user to change password before expiration' => {
+        name: 'MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Winlogon\PasswordExpiryWarning',
+        reg_type: '4',
+        policy_type: 'Registry Values',
+      },
+      'Interactive logon: Require Domain Controller authentication to unlock workstation' => {
+        name: 'MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Winlogon\ForceUnlockLogon',
+        reg_type: '4',
+        policy_type: 'Registry Values',
+      },
+      'Interactive logon: Require smart card' => {
+        name: 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\ScForceOption',
+        reg_type: '4',
+        policy_type: 'Registry Values',
+      },
+      'Interactive logon: Require Windows Hello for Business or smart card' => {
+        name: 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\ScForceOption',
+        reg_type: '4',
+        policy_type: 'Registry Values',
+      },
+      'Interactive logon: Smart card removal behavior' => {
+        name: 'MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Winlogon\ScRemoveOption',
+        reg_type: '1',
         policy_type: 'Registry Values',
       },
       'Microsoft network client: Digitally sign communications (always)' => {
@@ -749,15 +681,15 @@ class SecurityPolicy
         reg_type: '4',
         policy_type: 'Registry Values',
       },
-      'Microsoft network server: Server SPN target name validation level' => {
-        name: 'MACHINE\System\CurrentControlSet\Services\LanmanServer\Parameters\SmbServerNameHardeningLevel',
-        reg_type: '4',
-        policy_type: 'Registry Values',
-      },
       'Microsoft network server: Amount of idle time required before suspending session' => {
         name: 'MACHINE\System\CurrentControlSet\Services\LanManServer\Parameters\AutoDisconnect',
         reg_type: '4',
         policy_type: 'Registry Values',
+      },
+      'Microsoft network server: Attempt S4U2Self to obtain claim information' => {
+        name: 'MACHINE\System\CurrentControlSet\Services\LanManServer\Parameters\EnableS4U2SelfForClaims',
+        policy_type: 'Registry Values',
+        reg_type: '4',
       },
       'Microsoft network server: Digitally sign communications (always)' => {
         name: 'MACHINE\System\CurrentControlSet\Services\LanManServer\Parameters\RequireSecuritySignature',
@@ -774,14 +706,18 @@ class SecurityPolicy
         reg_type: '4',
         policy_type: 'Registry Values',
       },
-      'Network access: Named Pipes that can be accessed anonymously' => {
-        name: 'MACHINE\System\CurrentControlSet\Services\LanManServer\Parameters\NullSessionPipes',
-        reg_type: '7',
+      'Microsoft network server: Server SPN target name validation level' => {
+        name: 'MACHINE\System\CurrentControlSet\Services\LanmanServer\Parameters\SmbServerNameHardeningLevel',
+        reg_type: '4',
         policy_type: 'Registry Values',
       },
-      'Network access: Shares that can be accessed anonymously' => {
-        name: 'MACHINE\System\CurrentControlSet\Services\LanManServer\Parameters\NullSessionShares',
-        reg_type: '7',
+      'Network access: Allow anonymous SID/name translation' => {
+        name: 'LSAAnonymousNameLookup',
+        policy_type: 'System Access',
+      },
+      'Network access: Do not allow anonymous enumeration of SAM accounts' => {
+        name: 'MACHINE\System\CurrentControlSet\Control\Lsa\RestrictAnonymousSAM',
+        reg_type: '4',
         policy_type: 'Registry Values',
       },
       'Network access: Do not allow anonymous enumeration of SAM accounts and shares' => {
@@ -789,9 +725,24 @@ class SecurityPolicy
         reg_type: '4',
         policy_type: 'Registry Values',
       },
-      'Network access: Do not allow anonymous enumeration of SAM accounts' => {
-        name: 'MACHINE\System\CurrentControlSet\Control\Lsa\RestrictAnonymousSAM',
+      'Network access: Do not allow storage of passwords and credentials for network authentication' => {
+        name: 'MACHINE\System\CurrentControlSet\Control\Lsa\DisableDomainCreds',
         reg_type: '4',
+        policy_type: 'Registry Values',
+      },
+      'Network access: Let Everyone permissions apply to anonymous users' => {
+        name: 'MACHINE\System\CurrentControlSet\Control\Lsa\EveryoneIncludesAnonymous',
+        reg_type: '4',
+        policy_type: 'Registry Values',
+      },
+      'Network access: Named Pipes that can be accessed anonymously' => {
+        name: 'MACHINE\System\CurrentControlSet\Services\LanManServer\Parameters\NullSessionPipes',
+        reg_type: '7',
+        policy_type: 'Registry Values',
+      },
+      'Network access: Remotely accessible registry paths' => {
+        name: 'MACHINE\System\CurrentControlSet\Control\SecurePipeServers\Winreg\AllowedExactPaths\Machine',
+        reg_type: '7',
         policy_type: 'Registry Values',
       },
       'Network access: Remotely accessible registry paths and sub-paths' => {
@@ -804,13 +755,57 @@ class SecurityPolicy
         reg_type: '4',
         policy_type: 'Registry Values',
       },
+      'Network access: Restrict clients allowed to make remote calls to SAM' => {
+        name: 'MACHINE\System\CurrentControlSet\Control\Lsa\RestrictRemoteSAM',
+        policy_type: 'Registry Values',
+        reg_type: '1',
+      },
+      'Network access: Shares that can be accessed anonymously' => {
+        name: 'MACHINE\System\CurrentControlSet\Services\LanManServer\Parameters\NullSessionShares',
+        reg_type: '7',
+        policy_type: 'Registry Values',
+      },
+      'Network access: Sharing and security model for local accounts' => {
+        name: 'MACHINE\System\CurrentControlSet\Control\Lsa\ForceGuest',
+        reg_type: '4',
+        policy_type: 'Registry Values',
+      },
+      'Network security: Allow Local System to use computer identity for NTLM' => {
+        name: 'MACHINE\System\CurrentControlSet\Control\Lsa\UseMachineId',
+        reg_type: '4',
+        policy_type: 'Registry Values',
+      },
+      'Network security: Allow LocalSystem NULL session fallback' => {
+        name: 'MACHINE\System\CurrentControlSet\Control\Lsa\MSV1_0\allownullsessionfallback',
+        policy_type: 'Registry Values',
+        reg_type: '4',
+      },
+      'Network security: Allow PKU2U authentication requests to this computer to use online identities' => {
+        name: 'MACHINE\System\CurrentControlSet\Control\Lsa\pku2u\AllowOnlineID',
+        policy_type: 'Registry Values',
+        reg_type: '4',
+      },
+      'Network security: Configure encryption types allowed for Kerberos' => {
+        name: 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\Kerberos\Parameters\SupportedEncryptionTypes',
+        policy_type: 'Registry Values',
+        reg_type: '4',
+      },
       'Network security: Do not store LAN Manager hash value on next password change' => {
         name: 'MACHINE\System\CurrentControlSet\Control\Lsa\NoLMHash',
         reg_type: '4',
         policy_type: 'Registry Values',
       },
+      'Network security: Force logoff when logon hours expire' => {
+        name: 'ForceLogoffWhenHourExpire',
+        policy_type: 'System Access',
+      },
       'Network security: LAN Manager authentication level' => {
         name: 'MACHINE\System\CurrentControlSet\Control\Lsa\LmCompatibilityLevel',
+        reg_type: '4',
+        policy_type: 'Registry Values',
+      },
+      'Network security: LDAP client signing requirements' => {
+        name: 'MACHINE\System\CurrentControlSet\Services\LDAP\LDAPClientIntegrity',
         reg_type: '4',
         policy_type: 'Registry Values',
       },
@@ -823,61 +818,6 @@ class SecurityPolicy
         name: 'MACHINE\System\CurrentControlSet\Control\Lsa\MSV1_0\NTLMMinServerSec',
         reg_type: '4',
         policy_type: 'Registry Values',
-      },
-      'Network security: LDAP client signing requirements' => {
-        name: 'MACHINE\System\CurrentControlSet\Services\LDAP\LDAPClientIntegrity',
-        reg_type: '4',
-        policy_type: 'Registry Values',
-      },
-      'System objects: Require case insensitivity for non-Windows subsystems' => {
-        name: 'MACHINE\System\CurrentControlSet\Control\Session Manager\Kernel\ObCaseInsensitive',
-        policy_type: 'Registry Values',
-        reg_type: '4',
-      },
-      'System objects: Strengthen default permissions of internal system objects (e.g., Symbolic Links)' => {
-        name: 'MACHINE\System\CurrentControlSet\Control\Session Manager\ProtectionMode',
-        policy_type: 'Registry Values',
-        reg_type: '4',
-      },
-      'System settings: Optional subsystems' => {
-        name: 'MACHINE\System\CurrentControlSet\Control\Session Manager\SubSystems\optional',
-        policy_type: 'Registry Values',
-        reg_type: '7',
-      },
-      'Shutdown: Clear virtual memory pagefile' => {
-        name: 'MACHINE\System\CurrentControlSet\Control\Session Manager\Memory Management\ClearPageFileAtShutdown',
-        policy_type: 'Registry Values',
-        reg_type: '4',
-      },
-      'DCOM: Machine Access Restrictions in Security Descriptor Definition Language (SDDL) syntax' => {
-        name: 'MACHINE\Software\Policies\Microsoft\Windows NT\DCOM\MachineAccessRestriction',
-        policy_type: 'Registry Values',
-        reg_type: '1',
-      },
-      'DCOM: Machine Launch Restrictions in Security Descriptor Definition Language (SDDL) syntax' => {
-        name: 'MACHINE\Software\Policies\Microsoft\Windows NT\DCOM\MachineLaunchRestriction',
-        policy_type: 'Registry Values',
-        reg_type: '1',
-      },
-      'Microsoft network server: Attempt S4U2Self to obtain claim information' => {
-        name: 'MACHINE\System\CurrentControlSet\Services\LanManServer\Parameters\EnableS4U2SelfForClaims',
-        policy_type: 'Registry Values',
-        reg_type: '4',
-      },
-      'Network access: Restrict clients allowed to make remote calls to SAM' => {
-        name: 'MACHINE\System\CurrentControlSet\Control\Lsa\RestrictRemoteSAM',
-        policy_type: 'Registry Values',
-        reg_type: '1',
-      },
-      'Network security: Allow LocalSystem NULL session fallback' => {
-        name: 'MACHINE\System\CurrentControlSet\Control\Lsa\MSV1_0\allownullsessionfallback',
-        policy_type: 'Registry Values',
-        reg_type: '4',
-      },
-      'Network security: Allow PKU2U authentication requests to this computer to use online identities' => {
-        name: 'MACHINE\System\CurrentControlSet\Control\Lsa\pku2u\AllowOnlineID',
-        policy_type: 'Registry Values',
-        reg_type: '4',
       },
       'Network security: Restrict NTLM: Add remote server exceptions for NTLM authentication' => {
         name: 'MACHINE\System\CurrentControlSet\Control\Lsa\MSV1_0\ClientAllowedNTLMServers',
@@ -914,18 +854,103 @@ class SecurityPolicy
         policy_type: 'Registry Values',
         reg_type: '4',
       },
-      "Interactive logon: Don't display last signed-in" => {
-        name: 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\DontDisplayLastUserName',
+      'Recovery console: Allow automatic administrative logon' => {
+        name: 'MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Setup\RecoveryConsole\SecurityLevel',
         reg_type: '4',
         policy_type: 'Registry Values',
       },
-      "Interactive logon: Don't display username at sign-in" => {
-        name: 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\DontDisplayUserName',
+      'Recovery console: Allow floppy copy and access to all drives and all folders' => {
+        name: 'MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Setup\RecoveryConsole\SetCommand',
         reg_type: '4',
         policy_type: 'Registry Values',
       },
-      'Interactive logon: Require Windows Hello for Business or smart card' => {
-        name: 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\ScForceOption',
+      'Shutdown: Allow system to be shut down without having to log on' => {
+        name: 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\ShutdownWithoutLogon',
+        reg_type: '4',
+        policy_type: 'Registry Values',
+      },
+      'Shutdown: Clear virtual memory pagefile' => {
+        name: 'MACHINE\System\CurrentControlSet\Control\Session Manager\Memory Management\ClearPageFileAtShutdown',
+        policy_type: 'Registry Values',
+        reg_type: '4',
+      },
+      'System cryptography: Force strong key protection for user keys stored on the computer' => {
+        name: 'MACHINE\Software\Policies\Microsoft\Cryptography\ForceKeyProtection',
+        reg_type: '4',
+        policy_type: 'Registry Values',
+      },
+      'System cryptography: Use FIPS compliant algorithms for encryption, hashing, and signing' => {
+        name: 'MACHINE\System\CurrentControlSet\Control\Lsa\FIPSAlgorithmPolicy\Enabled',
+        reg_type: '4',
+        policy_type: 'Registry Values',
+      },
+      'System objects: Require case insensitivity for non-Windows subsystems' => {
+        name: 'MACHINE\System\CurrentControlSet\Control\Session Manager\Kernel\ObCaseInsensitive',
+        policy_type: 'Registry Values',
+        reg_type: '4',
+      },
+      'System objects: Strengthen default permissions of internal system objects (e.g., Symbolic Links)' => {
+        name: 'MACHINE\System\CurrentControlSet\Control\Session Manager\ProtectionMode',
+        policy_type: 'Registry Values',
+        reg_type: '4',
+      },
+      'System settings: Optional subsystems' => {
+        name: 'MACHINE\System\CurrentControlSet\Control\Session Manager\SubSystems\optional',
+        policy_type: 'Registry Values',
+        reg_type: '7',
+      },
+      'System settings: Use Certificate Rules on Windows Executables for Software Restriction Policies' => {
+        name: 'MACHINE\Software\Policies\Microsoft\Windows\Safer\CodeIdentifiers\AuthenticodeEnabled',
+        reg_type: '4',
+        policy_type: 'Registry Values',
+      },
+      'User Account Control: Admin Approval Mode for the Built-in Administrator account' => {
+        name: 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\FilterAdministratorToken',
+        reg_type: '4',
+        policy_type: 'Registry Values',
+      },
+      'User Account Control: Allow UIAccess applications to prompt for elevation without using the secure desktop' => {
+        name: 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\EnableUIADesktopToggle',
+        reg_type: '4',
+        policy_type: 'Registry Values',
+      },
+      'User Account Control: Behavior of the elevation prompt for administrators in Admin Approval Mode' => {
+        name: 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\ConsentPromptBehaviorAdmin',
+        reg_type: '4',
+        policy_type: 'Registry Values',
+      },
+      'User Account Control: Behavior of the elevation prompt for standard users' => {
+        name: 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\ConsentPromptBehaviorUser',
+        reg_type: '4',
+        policy_type: 'Registry Values',
+      },
+      'User Account Control: Detect application installations and prompt for elevation' => {
+        name: 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\EnableInstallerDetection',
+        reg_type: '4',
+        policy_type: 'Registry Values',
+      },
+      'User Account Control: Only elevate executables that are signed and validated' => {
+        name: 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\ValidateAdminCodeSignatures',
+        reg_type: '4',
+        policy_type: 'Registry Values',
+      },
+      'User Account Control: Only elevate UIAccess applications that are installed in secure locations' => {
+        name: 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\EnableSecureUIAPaths',
+        reg_type: '4',
+        policy_type: 'Registry Values',
+      },
+      'User Account Control: Run all administrators in Admin Approval Mode' => {
+        name: 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\EnableLUA',
+        reg_type: '4',
+        policy_type: 'Registry Values',
+      },
+      'User Account Control: Switch to the secure desktop when prompting for elevation' => {
+        name: 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\PromptOnSecureDesktop',
+        reg_type: '4',
+        policy_type: 'Registry Values',
+      },
+      'User Account Control: Virtualize file and registry write failures to per-user locations' => {
+        name: 'MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\EnableVirtualization',
         reg_type: '4',
         policy_type: 'Registry Values',
       },
