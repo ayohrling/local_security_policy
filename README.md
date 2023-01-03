@@ -14,13 +14,11 @@ LSP is key to a baseline configuration of the following security features:
   * Audit Policy
   * User Rights Assignment
   * Security Options
-  * Registry Values
-
 
 This module uses types and providers to list, update, and validate settings.
 
 ## Use
-The title and name of the resources is exact match of what is in secedit GUI.  If you are uncertain of the setting name and values just use `puppet resource local_security_policy` to pipe them all into a file and make adjustments as necessary.
+The title and name of the resources is exact match of what is in Local Security Policy GUI.  If you are uncertain of the setting name and values just use `puppet resource local_security_policy` to pipe them all into a file and make adjustments as necessary.
 The block will look like this
 ```
 local_security_policy { 'Audit account logon events': <- Title / Name
@@ -79,7 +77,9 @@ local_security_policy { 'System cryptography: Use FIPS compiant algorithms for e
       Access this computer from the network
       Account lockout duration
       Account lockout threshold
+      Accounts: Administrator account status
       Accounts: Block Microsoft accounts
+      Accounts: Guest account status
       Accounts: Limit local account use of blank passwords to console logon only
       Accounts: Rename administrator account
       Accounts: Rename guest account
@@ -170,6 +170,7 @@ local_security_policy { 'System cryptography: Use FIPS compiant algorithms for e
       Microsoft network server: Server SPN target name validation level
       Minimum password age
       Minimum password length
+      Minimum password length audit
       Modify an object label
       Modify firmware environment values
       Network access: Allow anonymous SID/name translation
@@ -187,6 +188,7 @@ local_security_policy { 'System cryptography: Use FIPS compiant algorithms for e
       Network security: All Local System to use computer identity for NTLM
       Network security: Allow LocalSystem NULL session fallback
       Network security: Allow PKU2U authentication requests to this computer to use online identities
+      Network security: Configure encryption types allowed for Kerberos
       Network security: Do not store LAN Manager hash value on next password change
       Network security: Force logoff when logon hours expire
       Network security: LAN Manager authentication level
@@ -200,12 +202,14 @@ local_security_policy { 'System cryptography: Use FIPS compiant algorithms for e
       Network security: Restrict NTLM: Incoming NTLM traffic
       Network security: Restrict NTLM: NTLM authentication in this domain
       Network security: Restrict NTLM: Outgoing NTLM traffic to remote servers
+      Obtain an impersonation token for another user in the same session
       Password must meet complexity requirements
       Perform volume maintenance tasks
       Profile single process
       Profile system performance
       Recovery console: Allow automatic administrative logon
       Recovery console: Allow floppy copy and access to all drives and all folders
+      Relax minimum password length limits
       Remove computer from docking station
       Replace a process level token
       Reset account lockout counter after
