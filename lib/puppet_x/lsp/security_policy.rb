@@ -44,7 +44,7 @@ class SecurityPolicy
       ''
     else
       sids = []
-      policy_value.split(',').sort.each do |suser|
+      policy_value.split(',').each do |suser|
         suser.strip!
         cur_user_sid = user_to_sid(suser)
         sids << cur_user_sid unless cur_user_sid.nil?

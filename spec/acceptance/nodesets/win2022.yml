@@ -7,12 +7,13 @@
 -%>
 ---
 HOSTS:
-  win2019:
+  win2016:
     roles:
       - default
       - windows
     platform: windows-server-amd64
-    box: gusztavvargadr/windows-server
+    box: 'gusztavvargadr/windows-server'
+    box_version: '~> 2102'
     hypervisor: <%= hypervisor %>
     vagrant_memsize: 2048
     vagrant_cpus: 2

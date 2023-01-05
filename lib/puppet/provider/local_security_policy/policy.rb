@@ -65,10 +65,10 @@ Puppet::Type.type(:local_security_policy).provide(:policy) do
       value = "\"#{value}\""
     when :principal
       sids = Array.[]
-      value.split(',').sort.each do |suser|
+      value.split(',').each do |suser|
         sids << ((suser !~ %r{^(\*S-1-.+)$}) ? ('*' + Puppet::Util::Windows::SID.name_to_sid(suser).to_s) : suser.to_s)
       end
-      value = sids.join(',')
+      value = sids.sort.join(',')
     end
     value
   end

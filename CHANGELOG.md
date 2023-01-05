@@ -1,3 +1,9 @@
+## [1.1.1] - 2023-01-03
+- Fixed SID order idempotency - #124
+
+## [1.1.0] - 2022-10-24
+- Add Windows 2022 support and new policies - #125
+
 ## [1.0.0] - 2022-02-09
 ### Added
 - Add Puppet7 Support - #115
