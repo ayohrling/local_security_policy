@@ -707,7 +707,7 @@ class SecurityPolicy
         policy_type: 'Registry Values',
       },
       'Microsoft network server: Server SPN target name validation level' => {
-        name: 'MACHINE\System\CurrentControlSet\Services\LanmanServer\Parameters\SmbServerNameHardeningLevel',
+        name: 'MACHINE\System\CurrentControlSet\Services\LanManServer\Parameters\SmbServerNameHardeningLevel',
         reg_type: '4',
         policy_type: 'Registry Values',
       },
