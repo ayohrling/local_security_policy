@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'fileutils'
+require 'puppet/util/skip_tags'
 
 begin
   require 'puppet_x/twp/inifile'
@@ -141,9 +142,6 @@ Puppet::Type.type(:local_security_policy).provide(:policy) do
 
   def self.prefetch(resources)
     reset_run_state
-    # remember every policy in the catalog so the first one to be flushed can write
-    # all of them in one go
-    @catalog_resources = resources.values
     policies = instances
     resources.each_key do |name|
       if found_pol = policies.find { |pol| pol.name == name } # rubocop:disable Lint/AssignmentInCondition
@@ -166,21 +164,10 @@ Puppet::Type.type(:local_security_policy).provide(:policy) do
     'c:\\windows\\temp\\secedit.inf'
   end
 
-  def temp_file
-    'c:\\windows\\temp\\secedit.inf'
-  end
-
-  # the resources of this type in the catalog, captured during prefetch
-  def self.catalog_resources
-    @catalog_resources ||= []
-  end
-
   # clears the state that is only valid for the duration of one puppet run.  A puppet
   # agent daemon reuses this process for every run, so none of it may be carried over
   def self.reset_run_state
-    @catalog_resources = []
     @batched_policies = nil
-    @batch_failed = false
     @file_object = nil
   end
 
@@ -191,46 +178,80 @@ Puppet::Type.type(:local_security_policy).provide(:policy) do
   end
 
   # writes the policy for the resource being flushed.  The first resource to get here
-  # writes every policy the catalog is going to change in one secedit call, so the
-  # rest are already applied by the time they are flushed.  If that combined write was
-  # rejected, each remaining policy is written on its own instead.
+  # writes every policy the catalog is going to change in one secedit call, so the rest
+  # are already applied by the time they are flushed.  Any policy that call did not
+  # apply is written on its own, which is what reports the failure against the policy
+  # that could not be applied.
   def self.apply_policy(resource)
     # a noop resource is only reported, it must never be written to the system
     return if resource.noop?
 
-    return apply_batch(resource) unless @batched_policies
-
-    # a policy that was left out of the batch still has to be written when it is
-    # flushed, and everything is rewritten individually once the batch has failed
-    return if !@batch_failed && @batched_policies.include?(resource[:name])
+    apply_batch(resource) unless @batched_policies
+    return if @batched_policies.include?(resource[:name])
 
     write_policies_to_system([resource.to_hash])
   end
 
-  # writes every policy the catalog is going to change with a single secedit call.  If
-  # windows rejects the combination, only the policy that triggered the write is
-  # retried here, so the resource that ends up marked failed is the one whose own value
-  # could not be applied rather than whichever resource happened to be flushed first.
+  # writes every policy the catalog is going to change with a single secedit call and
+  # records which policies that call applied.  secedit applies the settings it accepts
+  # before reporting an error, so a rejected batch is re-read rather than written off:
+  # only the policies that really did not land are written again, each by the resource
+  # that owns it.
   def self.apply_batch(resource)
     policies = batchable_policies(resource)
-    @batched_policies = policies.map { |policy_hash| policy_hash[:name] }
-    # assume the worst until the write comes back clean so that an unexpected error
-    # cannot leave the remaining policies thinking they were already written
-    @batch_failed = true
+    # nothing counts as applied until secedit has been run
+    @batched_policies = []
     begin
       write_policies_to_system(policies)
-      @batch_failed = false
+      @batched_policies = policies.map { |policy_hash| policy_hash[:name] }
     rescue Puppet::ExecutionFailure => e
-      Puppet.debug("Applying all local security policies at once failed, writing them one at a time: #{e.message}")
-      write_policies_to_system([resource.to_hash])
+      Puppet.warning("Applying the local security policies together failed, the ones that were not applied will be written individually: #{e.message}")
+      @batched_policies = policies_matching_system(policies)
     end
+  end
+
+  # the names of the given policies whose value already matches what the system
+  # reports, so that a rejected batch does not rewrite the settings secedit accepted
+  def self.policies_matching_system(policies)
+    # the cached export was taken before the write
+    @file_object = nil
+    current = instances.to_h { |instance| [instance.name, instance.policy_value.to_s] }
+    policies.select { |policy_hash| current[policy_hash[:name]] == policy_hash[:policy_value].to_s }
+            .map { |policy_hash| policy_hash[:name] }
+  rescue StandardError => e
+    Puppet.debug("Could not re-read the policy settings after the rejected batch: #{e.message}")
+    []
   end
 
   # the policies to write in the batched secedit call: the policy being flushed plus
   # every other policy in the catalog that puppet is going to change this run
   def self.batchable_policies(resource)
-    others = catalog_resources.reject { |other| other.ref == resource.ref }
-    [resource.to_hash] + others.select { |other| batchable?(other) }.map(&:to_hash)
+    policies = [resource.to_hash]
+    settings = policies.map { |policy_hash| policy_hash.values_at(:policy_type, :policy_setting) }
+    peers(resource).each do |other|
+      next unless batchable?(other)
+
+      policy_hash = other.to_hash
+      setting = policy_hash.values_at(:policy_type, :policy_setting)
+      # several policy titles can map to the same secedit setting and an inf file only
+      # holds one value per setting, so rather than silently dropping one of the values
+      # the second policy is left to its own write
+      if settings.include?(setting)
+        Puppet.warning("#{other.ref} writes the same secedit setting as another policy in this catalog and will be applied on its own")
+        next
+      end
+      settings << setting
+      policies << policy_hash
+    end
+    policies
+  end
+
+  # the other resources of this type in the catalog
+  def self.peers(resource)
+    catalog = resource.catalog
+    return [] unless catalog
+
+    catalog.resources.select { |other| other.instance_of?(resource.class) && other.ref != resource.ref }
   end
 
   # whether a policy that has not been flushed yet may be included in the batched
@@ -239,12 +260,17 @@ Puppet::Type.type(:local_security_policy).provide(:policy) do
   def self.batchable?(resource)
     # noop resources are reported but never written
     return false if resource.noop?
+    # this provider cannot remove a policy, and a policy with no value would be written
+    # into the inf as a bare `Setting =` line which secedit can reject
+    return false unless resource[:ensure] == :present
+    return false if resource[:policy_value].nil?
+    # a deferred value is only resolved once the transaction evaluates that resource,
+    # until then to_hash hands back the unresolved wrapper object
+    return false if deferred?(resource)
     # a policy that already matches the system does not need to be written at all
     return false unless out_of_sync?(resource)
-    # the transaction may well skip these, leave them to their own flush
-    return false if resource[:schedule]
-    return false if resource[:require] || resource[:subscribe]
-    return false if missing_tags?(resource)
+    # anything the transaction may skip is left to its own flush
+    return false if may_be_skipped?(resource)
 
     true
   rescue StandardError => e
@@ -254,13 +280,58 @@ Puppet::Type.type(:local_security_policy).provide(:policy) do
     false
   end
 
-  # mirrors Puppet::Transaction#missing_tags?; a resource filtered out by --tags is
-  # never evaluated and so must not be written
-  def self.missing_tags?(resource)
-    tags = Puppet[:tags].to_s.split(',').map(&:strip).reject(&:empty?)
-    return false if tags.empty?
+  # mirrors the checks in Puppet::Transaction#skip? that this provider is able to make
+  def self.may_be_skipped?(resource)
+    return true if resource.virtual?
+    return true if resource[:schedule]
+    return true if tag_filtered?(resource)
 
-    !resource.tagged?(*tags)
+    depends_on_others?(resource)
+  end
+
+  # Puppet::Transaction#skip_tags? and #missing_tags?, both of which are ignored when
+  # the catalog is not a host config
+  def self.tag_filtered?(resource)
+    catalog = resource.catalog
+    return false if catalog && !catalog.host_config?
+
+    skip_tags = Puppet::Util::SkipTags.new(Puppet[:skip_tags]).tags
+    return true if !skip_tags.empty? && resource.tagged?(*skip_tags)
+
+    # the transaction parses Puppet[:tags] through Puppet::Util::Tagging, which splits
+    # qualified tags, unlike the skip tags above
+    tags = Object.new.extend(Puppet::Util::Tagging).tap { |tagger| tagger.tags = Puppet[:tags] }.tags
+    !tags.empty? && !resource.tagged?(*tags)
+  end
+
+  # whether the transaction could skip this resource because something it depends on
+  # failed first.  Relationships declared with chaining arrows or with before/notify are
+  # stored on the other end of the edge, so the relationship graph is the only place all
+  # of a resource's dependencies can be seen; containment whits are not dependencies
+  def self.depends_on_others?(resource)
+    catalog = resource.catalog
+    return !resource[:require].nil? || !resource[:subscribe].nil? unless catalog
+
+    whit = Puppet::Type.type(:whit)
+    catalog.relationship_graph.direct_dependencies_of(resource).any? { |dependency| !dependency.instance_of?(whit) }
+  end
+
+  # whether any of the resource's values is still an unresolved Deferred.  Deferred
+  # values are only resolved when the transaction evaluates that resource, so writing
+  # one out from another resource's batch would put the wrapper object into the inf
+  def self.deferred?(resource)
+    return false unless defined?(Puppet::Pops::Evaluator::DeferredValue)
+
+    resource.to_hash.each_value.any? { |value| deferred_value?(value) }
+  end
+
+  def self.deferred_value?(value)
+    case value
+    when Puppet::Pops::Evaluator::DeferredValue then true
+    when Array then value.any? { |element| deferred_value?(element) }
+    when Hash then value.any? { |key, element| deferred_value?(key) || deferred_value?(element) }
+    else false
+    end
   end
 
   # whether the policy on the system differs from the policy in the catalog
@@ -294,10 +365,5 @@ Puppet::Type.type(:local_security_policy).provide(:policy) do
       FileUtils.rm_f(sdbout)
       # FileUtils.rm_f(logout)
     end
-  end
-
-  # writes out a single policy on its own
-  def write_policy_to_system(policy_hash)
-    self.class.write_policies_to_system([policy_hash])
   end
 end

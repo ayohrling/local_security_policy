@@ -253,16 +253,27 @@ take the user defined resources and compare the values against the exported poli
 the defined resource, the module will run `secedit /configure` to configure the policy on the system.  If the policy already
 exists on the system no change will be made.
 
-All of the policies that need to be changed during a Puppet run are applied together in a single `secedit /configure` call.
-Windows then validates the resulting combination of settings instead of each individual change, which is required for policies
-that constrain each other -- for example `Reset account lockout counter after` may not exceed `Account lockout duration`, so
-setting both to the same value only succeeds when they are applied together.  No ordering or `require` between the resources is
-needed.  If the combined call is rejected, each policy is retried on its own so that a single bad value cannot silently discard
-the rest, and the failure is reported against the resource that caused it.
+All of the policies that need to be changed during a Puppet run are applied together in a single `secedit /configure` call, so
+Windows validates the resulting combination of settings instead of each individual change.  This matters for policies that
+constrain each other: Windows requires `Reset account lockout counter after` to be no greater than `Account lockout duration`, and
+which of the two has to be written first depends on the values the host starts with, so no single ordering of the resources works
+on every host.  Applying them together removes that dependence on the starting state, and no ordering or `require` between the
+resources is needed.  If the combined call is rejected, the settings are re-read and only the policies that were not applied are
+written again on their own, so the failure is reported against the policies that could not be applied.
 
-Only policies that Puppet is actually going to change are included in the combined call.  A policy that is already in sync, that
-is running under `noop`, that is excluded by `--tags`, or that carries a `schedule`, `require` or `subscribe` is never written on
-another resource's behalf; it is applied on its own when Puppet evaluates it, exactly as before.
+Only policies that Puppet is actually going to change are included in the combined call.  A policy is never written on another
+resource's behalf when it is already in sync, running under `noop`, virtual, `ensure => absent` or without a value to set, still
+carrying an unresolved `Deferred` value, filtered out by `--tags` or `--skip_tags`, or carrying a `schedule` or an upstream
+ordering edge.  The same applies when two resource titles map to the same secedit setting, because an import file holds only one
+value per setting.  Anything left out is applied on its own when Puppet evaluates it, exactly as before.
+
+Two gaps remain in that check, both of which can let a policy be written slightly before the resource itself is evaluated:
+
+* ordering declared between classes or stages (`Class['a'] -> Class['b']`) is not recorded on the policy's own edges, so a policy
+  in an ordered class can be written before the earlier class has run -- and is still written if that class fails and Puppet then
+  skips the policy;
+* if the run is cancelled part way through, policies already written by the combined call are reported as skipped even though the
+  system was changed.
 
 In order to make setting these polices easier, this module uses the policy description from the Local Security Policy
 management console and translates that into the appropriate entries in the file used by `secedit /configure`.  Similarly, the module is

@@ -172,13 +172,19 @@ describe Puppet::Type.type(:local_security_policy).provider(:policy) do
     let(:written_batches) { [] }
 
     def lsp_resource(title, value, params = {})
-      Puppet::Type.type(:local_security_policy).new(
-        { name: title, ensure: 'present', policy_value: value }.merge(params),
-      )
+      params = { name: title, ensure: 'present', policy_value: value }.merge(params)
+      params.delete(:policy_value) if value.nil?
+      Puppet::Type.type(:local_security_policy).new(params)
     end
 
-    def prefetch(*resources)
-      described_class.prefetch(resources.to_h { |res| [res[:name], res] })
+    # puts the resources in a catalog, the way the transaction would, and hands each
+    # of them the provider prefetch found for it
+    def prepare(*resources)
+      catalog = Puppet::Resource::Catalog.new
+      resources.each { |res| catalog.add_resource(res) }
+      lsp = resources.grep(Puppet::Type.type(:local_security_policy))
+      described_class.prefetch(lsp.to_h { |res| [res[:name], res] })
+      catalog
     end
 
     # records what each secedit call would have been asked to write
@@ -186,6 +192,24 @@ describe Puppet::Type.type(:local_security_policy).provider(:policy) do
       allow(described_class).to receive(:write_policies_to_system) do |policy_hashes|
         written_batches << policy_hashes.map { |policy_hash| policy_hash[:name] }
       end
+    end
+
+    # the batched write is rejected, every write after it is recorded
+    def reject_first_write
+      calls = 0
+      allow(described_class).to receive(:write_policies_to_system) do |policy_hashes|
+        calls += 1
+        raise Puppet::ExecutionFailure, 'secedit returned 1' if calls == 1
+
+        written_batches << policy_hashes.map { |policy_hash| policy_hash[:name] }
+      end
+    end
+
+    # what the system reports once the rejected batch has been partly applied
+    def system_reports(values)
+      allow(described_class).to receive(:instances).and_return(
+        values.map { |title, value| described_class.new(name: title, policy_value: value) },
+      )
     end
 
     before(:each) do
@@ -204,7 +228,7 @@ describe Puppet::Type.type(:local_security_policy).provider(:policy) do
     it 'writes every out of sync policy in the catalog with a single secedit call' do
       expect(described_class).to receive(:secedit).once
 
-      prefetch(lockout_duration, lockout_reset)
+      prepare(lockout_duration, lockout_reset)
       lockout_duration.provider.flush
 
       expect(written_inf['System Access']).to eq('LockoutDuration' => '30', 'ResetLockoutCount' => '30')
@@ -212,7 +236,7 @@ describe Puppet::Type.type(:local_security_policy).provider(:policy) do
 
     it 'does not write again for a policy the batch already covered' do
       record_writes
-      prefetch(lockout_duration, lockout_reset)
+      prepare(lockout_duration, lockout_reset)
       lockout_duration.provider.flush
       lockout_reset.provider.flush
 
@@ -221,25 +245,113 @@ describe Puppet::Type.type(:local_security_policy).provider(:policy) do
 
     it 'leaves policies that are already in sync out of the batch' do
       record_writes
-      prefetch(lockout_duration, lockout_threshold)
+      prepare(lockout_duration, lockout_threshold)
       lockout_duration.provider.flush
 
       expect(written_batches).to eq([['Account lockout duration']])
     end
 
-    it 'leaves noop policies out of the batch' do
+    # a policy is only written on another resource's behalf when the transaction is
+    # definitely going to change it, so every one of these has to stay out of the batch
+    {
+      'noop' => { noop: true },
+      'ensure => absent' => { ensure: 'absent' },
+      'a schedule' => { schedule: 'maintenance' },
+      'a require' => { require: 'Notify[prep]' },
+      'a subscribe' => { subscribe: 'Notify[prep]' },
+    }.each do |description, params|
+      it "leaves a policy with #{description} out of the batch" do
+        record_writes
+        prepare(lockout_duration, lsp_resource('Reset account lockout counter after', '30', params))
+        lockout_duration.provider.flush
+
+        expect(written_batches).to eq([['Account lockout duration']])
+      end
+    end
+
+    # a policy with nothing to set would be written into the inf as a bare `Setting =`
+    # line, which secedit can reject, taking the whole batch down with it
+    it 'leaves a policy with no value to set out of the batch' do
       record_writes
-      noop_reset = lsp_resource('Reset account lockout counter after', '30', noop: true)
-      prefetch(lockout_duration, noop_reset)
+      valueless = lsp_resource('Reset account lockout counter after', nil)
+      prepare(lockout_duration, valueless)
+      # the policy is not on the system, so it is out of sync on ensure alone
+      valueless.provider = described_class.new(name: valueless[:name])
       lockout_duration.provider.flush
 
       expect(written_batches).to eq([['Account lockout duration']])
+    end
+
+    it 'leaves a virtual policy out of the batch' do
+      record_writes
+      virtual_reset = lockout_reset
+      virtual_reset.virtual = true
+      prepare(lockout_duration, virtual_reset)
+      lockout_duration.provider.flush
+
+      expect(written_batches).to eq([['Account lockout duration']])
+    end
+
+    it 'leaves a policy whose value is still deferred out of the batch' do
+      record_writes
+      deferred_reset = lsp_resource('Reset account lockout counter after',
+                                    Puppet::Pops::Evaluator::DeferredValue.new(-> { '30' }))
+      prepare(lockout_duration, deferred_reset)
+      lockout_duration.provider.flush
+
+      expect(written_batches).to eq([['Account lockout duration']])
+    end
+
+    it 'leaves a policy filtered out by --tags out of the batch' do
+      record_writes
+      Puppet[:tags] = 'other'
+      prepare(lockout_duration, lockout_reset)
+      lockout_duration.provider.flush
+
+      expect(written_batches).to eq([['Account lockout duration']])
+    end
+
+    it 'leaves a policy matched by --skip_tags out of the batch' do
+      record_writes
+      Puppet[:skip_tags] = 'skipme'
+      prepare(lockout_duration, lsp_resource('Reset account lockout counter after', '30', tag: 'skipme'))
+      lockout_duration.provider.flush
+
+      expect(written_batches).to eq([['Account lockout duration']])
+    end
+
+    # `Notify['prep'] -> Local_security_policy['x']` stores the edge on the notify, so
+    # the policy's own parameters show nothing; only the relationship graph does
+    it 'leaves a policy another resource is ordered before out of the batch' do
+      record_writes
+      prep = Puppet::Type.type(:notify).new(name: 'prep', before: 'Local_security_policy[Reset account lockout counter after]')
+      prepare(lockout_duration, lockout_reset, prep)
+      lockout_duration.provider.flush
+
+      expect(written_batches).to eq([['Account lockout duration']])
+    end
+
+    # both of these titles map to the ScForceOption registry value and an inf file only
+    # holds one value per setting, so the second one has to be written on its own
+    it 'leaves a policy that writes an already batched secedit setting out of the batch' do
+      record_writes
+      smart_card = lsp_resource('Interactive logon: Require smart card', '1')
+      hello = lsp_resource('Interactive logon: Require Windows Hello for Business or smart card', '1')
+      prepare(smart_card, hello)
+      # only the first title is found by the reverse mapping, so the second never gets a
+      # provider from prefetch, exactly as on a real system
+      hello.provider = described_class.new(name: hello[:name])
+      smart_card.provider.flush
+      hello.provider.flush
+
+      expect(written_batches).to eq([['Interactive logon: Require smart card'],
+                                     ['Interactive logon: Require Windows Hello for Business or smart card']])
     end
 
     it 'writes nothing when the policy being flushed is noop' do
       record_writes
       noop_duration = lsp_resource('Account lockout duration', '30', noop: true)
-      prefetch(noop_duration, lockout_reset)
+      prepare(noop_duration, lockout_reset)
       noop_duration.provider.flush
 
       expect(written_batches).to be_empty
@@ -248,32 +360,29 @@ describe Puppet::Type.type(:local_security_policy).provider(:policy) do
     it 'writes nothing at all when the whole run is noop' do
       record_writes
       Puppet[:noop] = true
-      prefetch(lockout_duration, lockout_reset)
+      prepare(lockout_duration, lockout_reset)
       [lockout_duration, lockout_reset].each { |res| res.provider.flush }
 
       expect(written_batches).to be_empty
     end
 
-    it 'leaves policies the transaction may skip out of the batch and writes them when they are flushed' do
-      record_writes
-      dependent_reset = lsp_resource('Reset account lockout counter after', '30', require: 'Notify[wait]')
-      prefetch(lockout_duration, dependent_reset)
-      lockout_duration.provider.flush
-      dependent_reset.provider.flush
+    it 'does not rewrite the policies a rejected batch did apply' do
+      prepare(lockout_duration, lockout_reset)
+      # secedit applied the duration before rejecting the file
+      system_reports('Account lockout duration' => '30')
+      reject_first_write
 
-      expect(written_batches).to eq([['Account lockout duration'], ['Reset account lockout counter after']])
+      lockout_duration.provider.flush
+      lockout_reset.provider.flush
+
+      expect(written_batches).to eq([['Reset account lockout counter after']])
     end
 
-    it 'retries only the policy being flushed when the batch is rejected' do
-      call = 0
-      allow(described_class).to receive(:write_policies_to_system) do |policy_hashes|
-        call += 1
-        raise Puppet::ExecutionFailure, 'secedit returned 1' if call == 1
+    it 'writes the policies a rejected batch did not apply as they are flushed' do
+      prepare(lockout_duration, lockout_reset)
+      system_reports({})
+      reject_first_write
 
-        written_batches << policy_hashes.map { |policy_hash| policy_hash[:name] }
-      end
-
-      prefetch(lockout_duration, lockout_reset)
       lockout_duration.provider.flush
       lockout_reset.provider.flush
 
@@ -281,9 +390,9 @@ describe Puppet::Type.type(:local_security_policy).provider(:policy) do
     end
 
     it 'raises out of flush when the policy itself cannot be written' do
+      prepare(lockout_duration)
+      system_reports({})
       allow(described_class).to receive(:write_policies_to_system).and_raise(Puppet::ExecutionFailure, 'secedit returned 1')
-
-      prefetch(lockout_duration)
 
       expect { lockout_duration.provider.flush }.to raise_error(Puppet::ExecutionFailure, %r{secedit returned 1})
     end
