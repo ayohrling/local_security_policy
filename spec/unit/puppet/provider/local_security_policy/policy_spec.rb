@@ -219,6 +219,8 @@ describe Puppet::Type.type(:local_security_policy).provider(:policy) do
       allow(PuppetX::IniFile).to receive(:new).and_call_original
       allow(PuppetX::IniFile).to receive(:new).with(no_args).and_return(written_inf)
       allow(written_inf).to receive(:write)
+      # by default every policy handed to secedit lands; the read back has its own tests
+      allow(described_class).to receive(:applied_policies) { |batched| batched.to_set { |res| res[:name] } }
     end
 
     after(:each) do
@@ -369,7 +371,7 @@ describe Puppet::Type.type(:local_security_policy).provider(:policy) do
     it 'does not rewrite the policies a rejected batch did apply' do
       prepare(lockout_duration, lockout_reset)
       # secedit applied the duration before rejecting the file
-      system_reports('Account lockout duration' => '30')
+      allow(described_class).to receive(:applied_policies).and_return(Set['Account lockout duration'])
       reject_first_write
 
       lockout_duration.provider.flush
@@ -380,7 +382,7 @@ describe Puppet::Type.type(:local_security_policy).provider(:policy) do
 
     it 'writes the policies a rejected batch did not apply as they are flushed' do
       prepare(lockout_duration, lockout_reset)
-      system_reports({})
+      allow(described_class).to receive(:applied_policies).and_return(Set.new)
       reject_first_write
 
       lockout_duration.provider.flush
@@ -391,10 +393,56 @@ describe Puppet::Type.type(:local_security_policy).provider(:policy) do
 
     it 'raises out of flush when the policy itself cannot be written' do
       prepare(lockout_duration)
-      system_reports({})
+      allow(described_class).to receive(:applied_policies).and_return(Set.new)
       allow(described_class).to receive(:write_policies_to_system).and_raise(Puppet::ExecutionFailure, 'secedit returned 1')
 
       expect { lockout_duration.provider.flush }.to raise_error(Puppet::ExecutionFailure, %r{secedit returned 1})
+    end
+
+    # secedit can skip an individual setting and still exit zero, so a clean exit is not
+    # taken as proof that everything in the file was applied
+    it 'writes a policy the combined call silently skipped even when secedit succeeded' do
+      record_writes
+      allow(described_class).to receive(:applied_policies).and_call_original
+      prepare(lockout_duration, lockout_reset)
+      system_reports('Account lockout duration' => '30')
+
+      lockout_duration.provider.flush
+      lockout_reset.provider.flush
+
+      expect(written_batches).to eq([['Account lockout duration', 'Reset account lockout counter after'],
+                                     ['Reset account lockout counter after']])
+    end
+
+    # a policy with nothing to set would poison the shared inf for every other policy
+    it 'writes a policy that cannot share an inf file on its own and still batches the rest' do
+      record_writes
+      absent = lsp_resource('Account lockout duration', '30', ensure: 'absent')
+      prepare(absent, lockout_reset, lockout_threshold)
+      absent.provider.flush
+      lockout_reset.provider.flush
+
+      expect(written_batches).to eq([['Account lockout duration'], ['Reset account lockout counter after']])
+    end
+
+    it 'batches a scheduled policy when schedules are being ignored' do
+      record_writes
+      Puppet[:ignoreschedules] = true
+      prepare(lockout_duration, lsp_resource('Reset account lockout counter after', '30', schedule: 'maintenance'))
+      lockout_duration.provider.flush
+
+      expect(written_batches).to eq([['Account lockout duration', 'Reset account lockout counter after']])
+    end
+
+    # Puppet::Transaction#split_qualified_tags? is false, so --tags foo::bar does not
+    # match a resource tagged only foo
+    it 'matches --tags without splitting qualified tags, the way the transaction does' do
+      record_writes
+      Puppet[:tags] = 'foo::bar'
+      prepare(lockout_duration, lsp_resource('Reset account lockout counter after', '30', tag: 'foo'))
+      lockout_duration.provider.flush
+
+      expect(written_batches).to eq([['Account lockout duration']])
     end
   end
   # rubocop:enable RSpec/MultipleMemoizedHelpers

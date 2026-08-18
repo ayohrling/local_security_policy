@@ -259,13 +259,21 @@ constrain each other: Windows requires `Reset account lockout counter after` to 
 which of the two has to be written first depends on the values the host starts with, so no single ordering of the resources works
 on every host.  Applying them together removes that dependence on the starting state, and no ordering or `require` between the
 resources is needed.  If the combined call is rejected, the settings are re-read and only the policies that were not applied are
-written again on their own, so the failure is reported against the policies that could not be applied.
+written again on their own, so the failure is reported against the policies that could not be applied.  The settings are read
+back after every combined call, not only after a failure, because `secedit` can skip an individual setting and still report
+success.
 
 Only policies that Puppet is actually going to change are included in the combined call.  A policy is never written on another
 resource's behalf when it is already in sync, running under `noop`, virtual, `ensure => absent` or without a value to set, still
-carrying an unresolved `Deferred` value, filtered out by `--tags` or `--skip_tags`, or carrying a `schedule` or an upstream
-ordering edge.  The same applies when two resource titles map to the same secedit setting, because an import file holds only one
-value per setting.  Anything left out is applied on its own when Puppet evaluates it, exactly as before.
+carrying an unresolved `Deferred` value, filtered out by `--tags` or `--skip_tags`, or carrying a `schedule` (unless
+`--ignoreschedules` is in effect) or an upstream ordering edge.  The same applies when two resource titles map to the same secedit
+setting, because an import file holds only one value per setting.  Anything left out is applied on its own when Puppet evaluates
+it, exactly as before, and the reason is logged at debug level.
+
+That last point is worth spelling out for anyone upgrading: **declaring an ordering between two `local_security_policy`
+resources takes both of them out of the combined call.**  Ordering was the usual workaround for interdependent policies before
+this module applied them together, and leaving it in place now defeats the fix -- the two policies go back to being written one
+at a time and can fail to converge again.  Remove any `require`, `subscribe` or chaining arrow between policies.
 
 Two gaps remain in that check, both of which can let a policy be written slightly before the resource itself is evaluated:
 
