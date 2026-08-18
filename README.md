@@ -253,6 +253,17 @@ take the user defined resources and compare the values against the exported poli
 the defined resource, the module will run `secedit /configure` to configure the policy on the system.  If the policy already
 exists on the system no change will be made.
 
+All of the policies that need to be changed during a Puppet run are applied together in a single `secedit /configure` call.
+Windows then validates the resulting combination of settings instead of each individual change, which is required for policies
+that constrain each other -- for example `Reset account lockout counter after` may not exceed `Account lockout duration`, so
+setting both to the same value only succeeds when they are applied together.  No ordering or `require` between the resources is
+needed.  If the combined call is rejected, each policy is retried on its own so that a single bad value cannot silently discard
+the rest, and the failure is reported against the resource that caused it.
+
+Only policies that Puppet is actually going to change are included in the combined call.  A policy that is already in sync, that
+is running under `noop`, that is excluded by `--tags`, or that carries a `schedule`, `require` or `subscribe` is never written on
+another resource's behalf; it is applied on its own when Puppet evaluates it, exactly as before.
+
 In order to make setting these polices easier, this module uses the policy description from the Local Security Policy
 management console and translates that into the appropriate entries in the file used by `secedit /configure`.  Similarly, the module is
 able to translate user and group names into the SID and name values that are used by User Rights Assignment policies.

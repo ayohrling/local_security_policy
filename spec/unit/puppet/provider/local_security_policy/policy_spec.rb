@@ -161,6 +161,135 @@ describe Puppet::Type.type(:local_security_policy).provider(:policy) do
     end
   end
 
+  # rubocop:disable RSpec/MultipleMemoizedHelpers -- the outer group already defines six helpers
+  describe 'batched writes' do
+    # the fixture reports LockoutDuration = 15, ResetLockoutCount = 15 and
+    # LockoutBadCount = 5, so a value of 30 is out of sync and 5 is in sync
+    let(:lockout_duration) { lsp_resource('Account lockout duration', '30') }
+    let(:lockout_reset) { lsp_resource('Reset account lockout counter after', '30') }
+    let(:lockout_threshold) { lsp_resource('Account lockout threshold', '5') }
+    let(:written_inf) { PuppetX::IniFile.new }
+    let(:written_batches) { [] }
+
+    def lsp_resource(title, value, params = {})
+      Puppet::Type.type(:local_security_policy).new(
+        { name: title, ensure: 'present', policy_value: value }.merge(params),
+      )
+    end
+
+    def prefetch(*resources)
+      described_class.prefetch(resources.to_h { |res| [res[:name], res] })
+    end
+
+    # records what each secedit call would have been asked to write
+    def record_writes
+      allow(described_class).to receive(:write_policies_to_system) do |policy_hashes|
+        written_batches << policy_hashes.map { |policy_hash| policy_hash[:name] }
+      end
+    end
+
+    before(:each) do
+      described_class.reset_run_state
+      allow(described_class).to receive(:secedit)
+      allow(FileUtils).to receive(:rm_f)
+      allow(PuppetX::IniFile).to receive(:new).and_call_original
+      allow(PuppetX::IniFile).to receive(:new).with(no_args).and_return(written_inf)
+      allow(written_inf).to receive(:write)
+    end
+
+    after(:each) do
+      described_class.reset_run_state
+    end
+
+    it 'writes every out of sync policy in the catalog with a single secedit call' do
+      expect(described_class).to receive(:secedit).once
+
+      prefetch(lockout_duration, lockout_reset)
+      lockout_duration.provider.flush
+
+      expect(written_inf['System Access']).to eq('LockoutDuration' => '30', 'ResetLockoutCount' => '30')
+    end
+
+    it 'does not write again for a policy the batch already covered' do
+      record_writes
+      prefetch(lockout_duration, lockout_reset)
+      lockout_duration.provider.flush
+      lockout_reset.provider.flush
+
+      expect(written_batches).to eq([['Account lockout duration', 'Reset account lockout counter after']])
+    end
+
+    it 'leaves policies that are already in sync out of the batch' do
+      record_writes
+      prefetch(lockout_duration, lockout_threshold)
+      lockout_duration.provider.flush
+
+      expect(written_batches).to eq([['Account lockout duration']])
+    end
+
+    it 'leaves noop policies out of the batch' do
+      record_writes
+      noop_reset = lsp_resource('Reset account lockout counter after', '30', noop: true)
+      prefetch(lockout_duration, noop_reset)
+      lockout_duration.provider.flush
+
+      expect(written_batches).to eq([['Account lockout duration']])
+    end
+
+    it 'writes nothing when the policy being flushed is noop' do
+      record_writes
+      noop_duration = lsp_resource('Account lockout duration', '30', noop: true)
+      prefetch(noop_duration, lockout_reset)
+      noop_duration.provider.flush
+
+      expect(written_batches).to be_empty
+    end
+
+    it 'writes nothing at all when the whole run is noop' do
+      record_writes
+      Puppet[:noop] = true
+      prefetch(lockout_duration, lockout_reset)
+      [lockout_duration, lockout_reset].each { |res| res.provider.flush }
+
+      expect(written_batches).to be_empty
+    end
+
+    it 'leaves policies the transaction may skip out of the batch and writes them when they are flushed' do
+      record_writes
+      dependent_reset = lsp_resource('Reset account lockout counter after', '30', require: 'Notify[wait]')
+      prefetch(lockout_duration, dependent_reset)
+      lockout_duration.provider.flush
+      dependent_reset.provider.flush
+
+      expect(written_batches).to eq([['Account lockout duration'], ['Reset account lockout counter after']])
+    end
+
+    it 'retries only the policy being flushed when the batch is rejected' do
+      call = 0
+      allow(described_class).to receive(:write_policies_to_system) do |policy_hashes|
+        call += 1
+        raise Puppet::ExecutionFailure, 'secedit returned 1' if call == 1
+
+        written_batches << policy_hashes.map { |policy_hash| policy_hash[:name] }
+      end
+
+      prefetch(lockout_duration, lockout_reset)
+      lockout_duration.provider.flush
+      lockout_reset.provider.flush
+
+      expect(written_batches).to eq([['Account lockout duration'], ['Reset account lockout counter after']])
+    end
+
+    it 'raises out of flush when the policy itself cannot be written' do
+      allow(described_class).to receive(:write_policies_to_system).and_raise(Puppet::ExecutionFailure, 'secedit returned 1')
+
+      prefetch(lockout_duration)
+
+      expect { lockout_duration.provider.flush }.to raise_error(Puppet::ExecutionFailure, %r{secedit returned 1})
+    end
+  end
+  # rubocop:enable RSpec/MultipleMemoizedHelpers
+
   it 'is an instance of Puppet::Type::Local_security_policy::ProviderPolicy' do
     expect(provider).to be_an_instance_of Puppet::Type::Local_security_policy::ProviderPolicy
   end

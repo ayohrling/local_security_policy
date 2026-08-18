@@ -1,3 +1,7 @@
+## [2.2.0] - 2026-08-18
+### Changed
+- Apply every policy changed during a Puppet run with a single `secedit /configure` call instead of one call per resource. Interdependent policies (ex: `Account lockout duration` and `Reset account lockout counter after`) no longer fail depending on the order Puppet evaluates them in, and no ordering or `require` between the resources is needed. If the combined call is rejected, each policy is retried on its own so the failure is still reported against the resource that caused it. Policies that Puppet is not going to change -- already in sync, `noop`, excluded by `--tags`, or carrying a `schedule`, `require` or `subscribe` -- are never included in the combined call.
+
 ## [2.1.0] - 2026-07-22
 ### Added
 - Add support for 'Domain controller: LDAP server signing requirements enforcement' and 'Network security: LDAP client encryption requirements'
