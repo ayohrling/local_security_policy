@@ -1,3 +1,7 @@
+## [2.2.0] - 2026-08-18
+### Changed
+- Apply every policy changed during a Puppet run with a single `secedit /configure` call instead of one call per resource. Interdependent policies (ex: `Account lockout duration` and `Reset account lockout counter after`) no longer depend on the order Puppet evaluates them in, or on the values the host starts with, and no ordering or `require` between the resources is needed. If the combined call is rejected, the settings are re-read and only the policies that were not applied are written again on their own, so the failure is reported against the policies that could not be applied. Policies Puppet is not going to change -- already in sync, `noop`, virtual, `ensure => absent` or without a value, still deferred, filtered out by `--tags`/`--skip_tags`, or carrying a `schedule` or an upstream ordering edge -- are never included in the combined call, and neither are two titles that map to the same secedit setting. The settings are read back after every combined call, since `secedit` can skip a setting and still report success. Note that declaring an ordering between two `local_security_policy` resources takes them out of the combined call -- remove any `require` or chaining that was previously used to work around interdependent policies. See the README for the two remaining gaps.
+
 ## [2.1.0] - 2026-07-22
 ### Added
 - Add support for 'Domain controller: LDAP server signing requirements enforcement' and 'Network security: LDAP client encryption requirements'
